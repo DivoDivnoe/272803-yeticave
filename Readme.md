@@ -1,7 +1,7 @@
 # Личный проект «YetiCave» 
 
 * Студент: [Андрей Иванов](https://up.htmlacademy.ru/php/1/user/272803).
-* Наставник: `Неизвестно`.
+* Наставник: [Андрей Алференков](https://htmlacademy.ru/profile/id103710).
 
 ---
 
