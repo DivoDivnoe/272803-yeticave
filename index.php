@@ -15,7 +15,7 @@ $now = time();
 $hours = floor(($tomorrow - $now)/(60 * 60));
 $minutes = floor((($tomorrow - $now) / 60) % ($hours * 60));
 
-$lot_time_remaining = "{$hours}:{$minutes}";
+$lot_time_remaining = ($hours < 10 ? '0' . $hours : $hours) . ':' . ($minutes < 10 ? '0' . $minutes : $minutes);
 ?>
 <!DOCTYPE html>
 <html lang="ru">
