@@ -17,12 +17,42 @@ function ts2relative($ts) {
     if ($dif > $twenty_four_hours) {
         $date = date('d.m.y в H:i' , $ts);
     } else if ($dif >= $one_hour) {
-        $date = gmdate('H часов назад', $dif);
+        $date = formatHours(gmdate('H', $dif));
     } else {
-        $date = gmdate('i минут назад', $dif);
+        $date = formatMinutes(gmdate('i', $dif));
     }
 
     return $date;
+}
+
+function formatMinutes($minutes) {
+    $last_char = substr($minutes, 1, 1);
+    $first_char = substr($minutes, 0, 1);
+
+    if ($last_char === '1' && $first_char !== '1') {
+        $result_str = $minutes . ' минуту назад';
+    } else if (($last_char === '2' || $last_char === '3' || $last_char === '4') && $first_char !== '1') {
+        $result_str = $minutes . ' минуты назад';
+    } else {
+        $result_str = $minutes . ' минут назад';
+    }
+
+    return $result_str;
+}
+
+function formatHours($date) {
+    $last_char = substr($date, 1, 1);
+    $first_char = substr($date, 0, 1);
+
+    if ($last_char === '1' && $first_char !== '1') {
+        $result_str = $date . ' час назад';
+    } else if (($last_char === '2' || $last_char === '3' || $last_char === '4') && $first_char !== '1') {
+        $result_str = $date . ' часа назад';
+    } else {
+        $result_str = $date . ' часов назад';
+    }
+
+    return $result_str;
 }
 ?>
 
@@ -128,11 +158,11 @@ function ts2relative($ts) {
                     <h3>История ставок (<span>4</span>)</h3>
                     <!-- заполните эту таблицу данными из массива $bets-->
                     <table class="history__list">
-                        <?php foreach ($bets as $value): ?>
+                        <?php foreach ($bets as $bet): ?>
                         <tr class="history__item">
-                            <td class="history__name"><?= $value['name'] ?></td>
-                            <td class="history__price"><?= $value['price'] . ' р.' ?></td>
-                            <td class="history__time"><?= ts2relative($value['ts']) ?></td>
+                            <td class="history__name"><?= $bet['name'] ?></td>
+                            <td class="history__price"><?= $bet['price'] . ' р.' ?></td>
+                            <td class="history__time"><?= ts2relative($bet['ts']) ?></td>
                         </tr>
                         <?php endforeach; ?>
                     </table>
