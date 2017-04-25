@@ -9,14 +9,14 @@ $bets = [
 ];
 
 function ts2relative($ts) {
-    $TWENTY_FOUR_HOURS = 24 * 60 * 60;
-    $ONE_HOUR = 60 * 60;
+    $twenty_four_hours = 24 * 60 * 60;
+    $one_hour = 60 * 60;
 
     $dif = time() - $ts;
 
-    if ($dif > $TWENTY_FOUR_HOURS) {
+    if ($dif > $twenty_four_hours) {
         $date = date('d.m.y в H:i' , $ts);
-    } else if ($dif >= $ONE_HOUR) {
+    } else if ($dif >= $one_hour) {
         $date = gmdate('H часов назад', $dif);
     } else {
         $date = gmdate('i минут назад', $dif);
