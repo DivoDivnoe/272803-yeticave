@@ -7,6 +7,45 @@ $bets = [
     ['name' => 'Евгений', 'price' => 10500, 'ts' => strtotime('-' . rand(25, 50) .' hour')],
     ['name' => 'Семён', 'price' => 10000, 'ts' => strtotime('last week')]
 ];
+
+function ts2relative($ts) {
+    $twenty_four_hours = 24 * 60 * 60;
+
+    $dif = time() - $ts;
+
+    if ($dif > $twenty_four_hours) {
+        $date = date('d.m.y в H:i' , $ts);
+    }  else {
+        $date = formatTime($dif);
+    }
+
+    return $date;
+}
+
+function formatTime($ts) {
+    $one_hour = 60 * 60;
+
+    if ($ts >= $one_hour) {
+        $timeString = ['часов', 'час', 'часа'];
+        $date = gmdate('H', $ts);
+    } else {
+        $timeString = ['минут', 'минута', 'минуты'];
+        $date = gmdate('i', $ts);
+    }
+    $last_char = substr($date, 1, 1);
+    $first_char = substr($date, 0, 1);
+    $last_chars = ['1', '2', '3', '4'];
+
+    if (!in_array($last_char, $last_chars) || $first_char === '1') {
+        $result_str = $date .  ' ' . $timeString[0] . ' назад';
+    } else if ($last_char === '1') {
+        $result_str = $date .  ' ' . $timeString[1] . ' назад';
+    } else {
+        $result_str = $date .  ' ' . $timeString[2] . ' назад';
+    }
+
+    return $result_str;
+}
 ?>
 
 <!DOCTYPE html>
@@ -111,11 +150,13 @@ $bets = [
                     <h3>История ставок (<span>4</span>)</h3>
                     <!-- заполните эту таблицу данными из массива $bets-->
                     <table class="history__list">
+                        <?php foreach ($bets as $bet): ?>
                         <tr class="history__item">
-                            <td class="history__name"><!-- имя автора--></td>
-                            <td class="history__price"><!-- цена--> р</td>
-                            <td class="history__time"><!-- дата в человеческом формате--></td>
+                            <td class="history__name"><?= $bet['name'] ?></td>
+                            <td class="history__price"><?= $bet['price'] . ' р.' ?></td>
+                            <td class="history__time"><?= ts2relative($bet['ts']) ?></td>
                         </tr>
+                        <?php endforeach; ?>
                     </table>
                 </div>
             </div>

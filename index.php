@@ -89,13 +89,13 @@ $items = [
             <h2>Открытые лоты</h2>
             <select class="lots__select">
                 <option>Все категории</option>
-                <?php foreach ($categories as $index => $value): ?>
+                <?php foreach ($categories as $value): ?>
                 <option><?= $value ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
         <ul class="lots__list">
-            <?php foreach ($items as $index => $value): ?>
+            <?php foreach ($items as $value): ?>
             <li class="lots__item lot">
                 <div class="lot__image">
                     <img src="<?= $value['url'] ?>" width="350" height="260" alt="Сноуборд">
