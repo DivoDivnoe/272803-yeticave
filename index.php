@@ -36,8 +36,8 @@ require 'functions.php';
     <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
-<?= includeTemplate('templates/header.php', []); ?>
+<?= includeTemplate('templates/header.php'); ?>
 <?= includeTemplate('templates/main.php', [$categories, $items, $lot_time_remaining]); ?>
-<?= includeTemplate('templates/footer.php', []); ?>
+<?= includeTemplate('templates/footer.php'); ?>
 </body>
 </html>
