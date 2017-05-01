@@ -1,6 +1,6 @@
 <select class="lots__select">
     <option>Все категории</option>
-    <?php foreach ($data[0] as $category): ?>
+    <?php foreach ($categories as $category): ?>
         <option><?= $category ?></option>
     <?php endforeach; ?>
 </select>

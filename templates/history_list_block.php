@@ -1,5 +1,5 @@
 <table class="history__list">
-    <?php foreach ($data[0] as $bet): ?>
+    <?php foreach ($bets as $bet): ?>
         <tr class="history__item">
             <td class="history__name"><?= $bet['name'] ?></td>
             <td class="history__price"><?= $bet['price'] . ' р.' ?></td>
