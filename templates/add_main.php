@@ -21,7 +21,7 @@
             </li>
         </ul>
     </nav>
-    <form class="form form--add-lot container <?= $valid['class']; ?>" action="../add.php" method="post" enctype="multipart/form-data"> <!-- form--invalid -->
+    <form class="form form--add-lot container <?= $valid ?>" action="../add.php" method="post" enctype="multipart/form-data"> <!-- form--invalid -->
         <h2>Добавление лота</h2>
         <div class="form__container-two">
             <div class="form__item <?= $title['class'] ?>"> <!-- form__item--invalid -->

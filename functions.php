@@ -113,7 +113,9 @@ function checkLotForm($title, $category, $message, $user_file, $lot_rate, $lot_s
 
     foreach ($arr as $value) {
         if (!empty($value['class'])) {
-            return'form--invalid';
+            return 'form--invalid';
         }
     }
+
+    return '';
 }
