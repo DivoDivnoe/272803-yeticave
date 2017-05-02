@@ -8,3 +8,10 @@ $items = [
     ['title' => 'Куртка для сноуборда DC Mutiny Charocal',           'category' => 'Одежда',       'price' => 7500,   'url' => 'img/lot-5.jpg'],
     ['title' => 'Маска Oakley Canopy',                               'category' => 'Разное',       'price' => 5400,   'url' => 'img/lot-6.jpg']
 ];
+
+$bets = [
+    ['name' => 'Иван', 'price' => 11500, 'ts' => strtotime('-' . rand(1, 50) .' minute')],
+    ['name' => 'Константин', 'price' => 11000, 'ts' => strtotime('-' . rand(1, 18) .' hour')],
+    ['name' => 'Евгений', 'price' => 10500, 'ts' => strtotime('-' . rand(25, 50) .' hour')],
+    ['name' => 'Семён', 'price' => 10000, 'ts' => strtotime('last week')]
+];

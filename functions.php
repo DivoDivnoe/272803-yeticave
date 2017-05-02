@@ -58,3 +58,62 @@ function formatTime($ts) {
 
     return $result_str;
 }
+
+function checkTextInput($text) {
+    $class = '';
+    $error = '';
+
+    if (empty($_POST[$text])) {
+        $class = 'form__item--invalid';
+        $error = 'Заполните это поле';
+    }
+
+    return ['class' => $class, 'error' => $error];
+}
+
+function checkNumberInput($num) {
+    $class = 'form__item--invalid';
+    $error = '';
+
+    if (!empty($_POST[$num])) {
+        if (!is_numeric($_POST[$num])) {
+            $error =  'Вы ввели не число';
+        } else if ($_POST[$num] <= 0) {
+            $error =  'Число должно быть положительным';
+        } else {
+            $class = '';
+        }
+    } else {
+        $error =  'Заполните это поле';
+    }
+
+    return ['class' => $class, 'error' => $error];
+}
+
+function checkFileInput($user_file) {
+    $class = 'form__item--invalid';
+    $error = '';
+
+    if (isset($_FILES[$user_file])) {
+        $file = $_FILES[$user_file];
+        if (is_uploaded_file($file['tmp_name'])) {
+            move_uploaded_file($file['tmp_name'], "img/{$file['name']}");
+            $class = '';
+        } else {
+            $error = 'Ошибка при загрузке файла';
+        }
+    } else {
+        $error =  'Выберите изображение лота';
+    }
+    return ['class' => $class, 'error' => $error];
+}
+
+function checkLotForm($title, $category, $message, $user_file, $lot_rate, $lot_step, $lot_date) {
+    $arr = [$title, $category, $message, $user_file, $lot_rate, $lot_step, $lot_date];
+
+    foreach ($arr as $value) {
+        if (!empty($value['class'])) {
+            return'form--invalid';
+        }
+    }
+}
