@@ -3,12 +3,8 @@
 require 'lots_array.php';
 require 'functions.php';
 
-if (isset($_GET['lot_id'])):
-    if (!array_key_exists($_GET['lot_id'], $items)) {
-        header('HTTP/1.1 404 Not Found');
-        exit;
-    }
-?>
+if (isset($_GET['lot_id'])) {
+    if (array_key_exists($_GET['lot_id'], $items)) { ?>
 
 <!DOCTYPE html>
 <html lang="ru">
@@ -24,5 +20,9 @@ if (isset($_GET['lot_id'])):
 <?= includeTemplate('templates/footer.php', []); ?>
 </body>
 </html>
-
-<?php endif; ?>
+    <?php
+        exit;
+    }
+}
+header('HTTP/1.1 404 Not Found');
+exit; ?>

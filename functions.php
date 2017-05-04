@@ -62,57 +62,88 @@ function formatTime($ts) {
 function checkTextInput($text) {
     $class = '';
     $error = '';
+    $value = '';
 
-    if (empty($_POST[$text])) {
-        $class = 'form__item--invalid';
-        $error = 'Заполните это поле';
+    if (isset($_POST[$text])) {
+        $value = $_POST[$text];
+
+        if (!$value) {
+            $class = 'form__item--invalid';
+            $error = 'Заполните это поле';
+        }
     }
 
-    return ['class' => $class, 'error' => $error];
+    return ['class' => $class, 'error' => $error, 'value' => $value];
+}
+
+function checkSelectInput($name, $default) {
+    $class = '';
+    $error = '';
+    $value = $default;
+
+    if (isset($_POST[$name])) {
+        $value = $_POST[$name];
+
+        if ($value === $default) {
+            $class = 'form__item--invalid';
+            $error = 'Выберите значение';
+        }
+    }
+
+    return ['class' => $class, 'error' => $error, 'value' => $value];
 }
 
 function checkNumberInput($num) {
-    $class = 'form__item--invalid';
+    $class = '';
     $error = '';
+    $value = '';
 
-    if (!empty($_POST[$num])) {
-        if (!is_numeric($_POST[$num])) {
-            $error =  'Вы ввели не число';
-        } else if ($_POST[$num] <= 0) {
-            $error =  'Число должно быть положительным';
+    if (isset($_POST[$num])) {
+        $value = $_POST[$num];
+        $class = 'form__item--invalid';
+
+        if ($value) {
+            if (!is_numeric($value)) {
+                $error =  'Вы ввели не число';
+            } else if ($value <= 0) {
+                $error =  'Число должно быть положительным';
+            } else {
+                $class = '';
+            }
         } else {
-            $class = '';
+            $error =  'Заполните это поле';
         }
-    } else {
-        $error =  'Заполните это поле';
     }
 
-    return ['class' => $class, 'error' => $error];
+    return ['class' => $class, 'error' => $error, 'value' => $value];
 }
 
 function checkFileInput($user_file) {
-    $class = 'form__item--invalid';
+    $class = '';
     $error = '';
 
-    if (isset($_FILES[$user_file])) {
-        $file = $_FILES[$user_file];
-        if (is_uploaded_file($file['tmp_name'])) {
-            move_uploaded_file($file['tmp_name'], "img/{$file['name']}");
-            $class = '';
-        } else {
-            $error = 'Ошибка при загрузке файла';
+        if (isset($_FILES[$user_file])) {
+            $file = $_FILES[$user_file];
+            $class = 'form__item--invalid';
+
+            if (!$file['name']) {
+                $error =  'Выберите изображение лота';
+            }
+
+            if (is_uploaded_file($file['tmp_name'])) {
+                move_uploaded_file($file['tmp_name'], "img/{$file['name']}");
+                $class = '';
+            } else {
+                $error = 'Ошибка при загрузке файла';
+            }
         }
-    } else {
-        $error =  'Выберите изображение лота';
-    }
+
     return ['class' => $class, 'error' => $error];
 }
 
-function checkLotForm($title, $category, $message, $user_file, $lot_rate, $lot_step, $lot_date) {
-    $arr = [$title, $category, $message, $user_file, $lot_rate, $lot_step, $lot_date];
-
-    foreach ($arr as $value) {
-        if (!empty($value['class'])) {
+function checkLotForm($checkedFields) {
+    foreach ($checkedFields as $value) {
+        if ($value['class']) {
             return 'form--invalid';
         }
     }
