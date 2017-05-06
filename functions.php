@@ -58,3 +58,95 @@ function formatTime($ts) {
 
     return $result_str;
 }
+
+function checkTextInput($text) {
+    $class = '';
+    $error = '';
+    $value = '';
+
+    if (isset($_POST[$text])) {
+        $value = $_POST[$text];
+
+        if (!$value) {
+            $class = 'form__item--invalid';
+            $error = 'Заполните это поле';
+        }
+    }
+
+    return ['class' => $class, 'error' => $error, 'value' => $value];
+}
+
+function checkSelectInput($name, $default) {
+    $class = '';
+    $error = '';
+    $value = $default;
+
+    if (isset($_POST[$name])) {
+        $value = $_POST[$name];
+
+        if ($value === $default) {
+            $class = 'form__item--invalid';
+            $error = 'Выберите значение';
+        }
+    }
+
+    return ['class' => $class, 'error' => $error, 'value' => $value];
+}
+
+function checkNumberInput($num) {
+    $class = '';
+    $error = '';
+    $value = '';
+
+    if (isset($_POST[$num])) {
+        $value = $_POST[$num];
+        $class = 'form__item--invalid';
+
+        if ($value) {
+            if (!is_numeric($value)) {
+                $error =  'Вы ввели не число';
+            } else if ($value <= 0) {
+                $error =  'Число должно быть положительным';
+            } else {
+                $class = '';
+            }
+        } else {
+            $error =  'Заполните это поле';
+        }
+    }
+
+    return ['class' => $class, 'error' => $error, 'value' => $value];
+}
+
+function checkFileInput($user_file) {
+    $class = '';
+    $error = '';
+
+        if (isset($_FILES[$user_file])) {
+            $file = $_FILES[$user_file];
+            $class = 'form__item--invalid';
+
+            if (!$file['name']) {
+                $error =  'Выберите изображение лота';
+            }
+
+            if (is_uploaded_file($file['tmp_name'])) {
+                move_uploaded_file($file['tmp_name'], "img/{$file['name']}");
+                $class = '';
+            } else {
+                $error = 'Ошибка при загрузке файла';
+            }
+        }
+
+    return ['class' => $class, 'error' => $error];
+}
+
+function checkLotForm($checkedFields) {
+    foreach ($checkedFields as $value) {
+        if ($value['class']) {
+            return 'form--invalid';
+        }
+    }
+
+    return '';
+}
