@@ -32,13 +32,9 @@
             <div class="form__item <?= $category['class'] ?>">
                 <label for="category">Категория</label>
                 <select id="category" name="category" value="<?= $category['value'] ?>">
-                    <option>Выберите категорию</option>
-                    <option>Доски и лыжи</option>
-                    <option>Крепления</option>
-                    <option>Ботинки</option>
-                    <option>Одежда</option>
-                    <option>Инструменты</option>
-                    <option>Разное</option>
+                    <?php foreach ($category['options'] as $option => $selected): ?>
+                        <option <?= $selected ?>><?= $option ?></option>
+                    <?php endforeach; ?>
                 </select>
                 <span class="form__error"><?= $category['error'] ?></span>
             </div>

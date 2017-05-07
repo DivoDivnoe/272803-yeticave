@@ -76,21 +76,24 @@ function checkTextInput($text) {
     return ['class' => $class, 'error' => $error, 'value' => $value];
 }
 
-function checkSelectInput($name, $default) {
+function checkSelectInput($name) {
     $class = '';
     $error = '';
-    $value = $default;
+    $options = ['Выберите категорию' => '', 'Доски и лыжи' => '', 'Крепления' => '', 'Ботинки' => '', 'Одежда' => '', 'Инструменты' => '', 'Разное' => ''];
+    $value = array_keys($options)[0];
 
     if (isset($_POST[$name])) {
         $value = $_POST[$name];
 
-        if ($value === $default) {
+        if ($value === array_keys($options)[0]) {
             $class = 'form__item--invalid';
             $error = 'Выберите значение';
+        } else {
+            $options[$value] = 'selected';
         }
     }
 
-    return ['class' => $class, 'error' => $error, 'value' => $value];
+    return ['class' => $class, 'error' => $error, 'value' => $value, 'options' => $options];
 }
 
 function checkNumberInput($num) {
@@ -122,21 +125,24 @@ function checkFileInput($user_file) {
     $class = '';
     $error = '';
 
-        if (isset($_FILES[$user_file])) {
-            $file = $_FILES[$user_file];
-            $class = 'form__item--invalid';
+    if (isset($_FILES[$user_file])) {
+        $file = $_FILES[$user_file];
+        $class = 'form__item--invalid';
 
-            if (!$file['name']) {
-                $error =  'Выберите изображение лота';
-            }
+        if (!$file['name']) {
+            $error =  'Выберите изображение лота';
+        }
 
-            if (is_uploaded_file($file['tmp_name'])) {
-                move_uploaded_file($file['tmp_name'], "img/{$file['name']}");
+        if (is_uploaded_file($file['tmp_name'])) {
+            if (move_uploaded_file($file['tmp_name'], "img/{$file['name']}")) {
                 $class = '';
             } else {
-                $error = 'Ошибка при загрузке файла';
+                $error = 'Ошибка при перемещении загруженного файла';
             }
+        } else {
+            $error = "Ошибка {$file['error']} при загрузке файла";
         }
+    }
 
     return ['class' => $class, 'error' => $error];
 }
@@ -149,4 +155,19 @@ function checkLotForm($checkedFields) {
     }
 
     return '';
+}
+
+function authUser($email, $pass) {
+    global $users;
+
+    foreach ($users as $index => $user) {
+        if ($user['email'] === $email && password_verify($pass, $user['password'])) {
+            session_start();
+            $_SESSION['user'] = $user['name'];
+        }
+    }
+    $class = 'form__item--invalid';
+    $error = 'Комбинация пользователь - пароль неверна';
+
+    return ['class' => $class, 'error' => $error];
 }
