@@ -159,15 +159,17 @@ function checkLotForm($checkedFields) {
 
 function authUser($email, $pass) {
     global $users;
+    $class = 'form__item--invalid';
+    $error = 'Комбинация пользователь - пароль неверна';
 
     foreach ($users as $index => $user) {
         if ($user['email'] === $email && password_verify($pass, $user['password'])) {
             session_start();
             $_SESSION['user'] = $user['name'];
+            $class = '';
+            $error = '';
         }
     }
-    $class = 'form__item--invalid';
-    $error = 'Комбинация пользователь - пароль неверна';
 
     return ['class' => $class, 'error' => $error];
 }

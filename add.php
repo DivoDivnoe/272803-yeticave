@@ -27,7 +27,7 @@ $validate_form = checkLotForm([$title_post, $category_post, $message_post, $user
     <link href="../css/style.css" rel="stylesheet">
 </head>
 <body>
-    <?= includeTemplate('templates/header.php'); ?>
+    <?= includeTemplate('templates/header.php', ['user_name' => $_SESSION['user']]); ?>
     <?php if (!isset($_POST['submit']) || $validate_form): ?>
     <?= includeTemplate('templates/add_main.php', [ 'title' => $title_post,
                                                 'category' => $category_post,
