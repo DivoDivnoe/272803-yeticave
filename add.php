@@ -1,15 +1,22 @@
 <?php
+session_start();
+
+if (!isset($_SESSION['user'])) {
+    header('HTTP/1.1 403 Forbidden');
+    exit;
+}
+
 require 'lots_array.php';
 require 'functions.php';
 
-    $title_post = checkTextInput('lot-name');
-    $category_post = checkSelectInput('category', 'Выберите категорию');
-    $message_post = checkTextInput('message');
-    $user_file_post = checkFileInput('user_file');
-    $lot_rate_post = checkNumberInput('lot-rate');
-    $lot_step_post = checkNumberInput('lot-step');
-    $lot_date_post = checkTextInput('lot-date');
-    $validate_form = checkLotForm([$title_post, $category_post, $message_post, $user_file_post, $lot_rate_post, $lot_step_post, $lot_date_post]);
+$title_post = checkTextInput('lot-name');
+$category_post = checkSelectInput('category');
+$message_post = checkTextInput('message');
+$user_file_post = checkFileInput('user_file');
+$lot_rate_post = checkNumberInput('lot-rate');
+$lot_step_post = checkNumberInput('lot-step');
+$lot_date_post = checkTextInput('lot-date');
+$validate_form = checkLotForm([$title_post, $category_post, $message_post, $user_file_post, $lot_rate_post, $lot_step_post, $lot_date_post]);
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -20,7 +27,7 @@ require 'functions.php';
     <link href="../css/style.css" rel="stylesheet">
 </head>
 <body>
-    <?= includeTemplate('templates/add_header.php'); ?>
+    <?= includeTemplate('templates/header.php', ['user_name' => $_SESSION['user']]); ?>
     <?php if (!isset($_POST['submit']) || $validate_form): ?>
     <?= includeTemplate('templates/add_main.php', [ 'title' => $title_post,
                                                 'category' => $category_post,

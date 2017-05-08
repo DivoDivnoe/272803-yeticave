@@ -19,6 +19,8 @@ $categories = ['Доски и лыжи', 'Крепления', 'Ботинки',
 
 require 'lots_array.php';
 require 'functions.php';
+
+session_start();
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -29,7 +31,11 @@ require 'functions.php';
     <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
+<?php if (isset($_SESSION['user'])): ?>
+<?= includeTemplate('templates/header.php', ['user_name' => $_SESSION['user']]); ?>
+<?php else: ?>
 <?= includeTemplate('templates/header.php'); ?>
+<?php endif; ?>
 <?= includeTemplate('templates/main.php', ['categories' => $categories, 'equip_items' => $items, 'lot_time_remaining' => $lot_time_remaining]); ?>
 <?= includeTemplate('templates/footer.php'); ?>
 </body>
