@@ -32,7 +32,7 @@ session_start();
 </head>
 <body>
 <?php if (isset($_SESSION['user'])): ?>
-<?= includeTemplate('templates/header.php', ['user_name' => $_SESSION['user']]); ?>
+<?= includeTemplate('templates/header.php'); ?>
 <?php else: ?>
 <?= includeTemplate('templates/header.php'); ?>
 <?php endif; ?>
