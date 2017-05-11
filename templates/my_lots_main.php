@@ -24,7 +24,6 @@
     <section class="rates container">
         <h2>Мои ставки</h2>
         <table class="rates__list">
-            <?php //var_dump($my_bets); ?>
             <?php foreach ($my_bets as $id => $bet): ?>
                 <tr class="rates__item">
                     <td class="rates__info">

@@ -42,28 +42,29 @@
             </div>
             <div class="lot-item__right">
                 <?php if (isset($_SESSION['user']) && !isset($_COOKIE['my_bets'][$id])): ?>
-                <div class="lot-item__state">
-                    <div class="lot-item__timer timer">
-                        10:54:12
-                    </div>
-                    <div class="lot-item__cost-state">
-                        <div class="lot-item__rate">
-                            <span class="lot-item__amount">Текущая цена</span>
-                            <span class="lot-item__cost"><?= $equip_item['price'] ?></span>
+                    <div class="lot-item__state">
+                        <div class="lot-item__timer timer">
+                            10:54:12
                         </div>
-                        <div class="lot-item__min-cost">
-                            Мин. ставка <span>12 000 р</span>
+                        <div class="lot-item__cost-state">
+                            <div class="lot-item__rate">
+                                <span class="lot-item__amount">Текущая цена</span>
+                                <span class="lot-item__cost"><?= $equip_item['price'] ?></span>
+                            </div>
+                            <div class="lot-item__min-cost">
+                                Мин. ставка <span>12 000 р</span>
+                            </div>
                         </div>
+                        <form class="lot-item__form" action="lot.php?lot_id=<?= $id ?>" method="post">
+                            <p class="lot-item__form-item <?= $cost['class'] ?>">
+                                <label for="cost">Ваша ставка</label>
+                                <input type="hidden" name="lot_id" value="<?= $id ?>">
+                                <input id="cost" type="number" name="cost" placeholder="12 000">
+                                <span class="form__error"><?= $cost['error'] ?></span>
+                            </p>
+                            <button type="submit" class="button">Сделать ставку</button>
+                        </form>
                     </div>
-                    <form class="lot-item__form" action="lot.php" method="post">
-                        <p class="lot-item__form-item">
-                            <label for="cost">Ваша ставка</label>
-                            <input type="hidden" name="lot_id" value="<?= $id ?>">
-                            <input id="cost" type="number" name="cost" placeholder="12 000">
-                        </p>
-                        <button type="submit" class="button">Сделать ставку</button>
-                    </form>
-                </div>
                 <?php endif; ?>
                 <div class="history">
                     <h3>История ставок (<span>4</span>)</h3>

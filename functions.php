@@ -174,16 +174,10 @@ function authUser($email, $pass, $users) {
     return ['class' => $class, 'error' => $error];
 }
 
-function addBet() {
-    if (isset($_POST['cost'])) {
-        date_default_timezone_set('Europe/Moscow');
+function addBet($bet, $lot_id) {
+    $bet_data = ['cost' => $bet, 'date' => time()];
+    $bet_data = json_encode($bet_data);
+    $expire = strtotime('+1 year');
 
-        $bet_data = ['cost' => $_POST['cost'], 'date' => time()];
-        $bet_data = json_encode($bet_data);
-        $expire = strtotime('+1 year');
-
-        header('Location: mylots.php');
-        setcookie("my_bets[{$_POST['lot_id']}]", $bet_data, $expire, '/');
-        exit;
-    }
+    setcookie("my_bets[{$lot_id}]", $bet_data, $expire, '/');
 }
