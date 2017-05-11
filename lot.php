@@ -4,6 +4,8 @@ session_start();
 require 'lots_array.php';
 require 'functions.php';
 
+addBet();
+
 $idIsValid = isset($_GET['lot_id']) && array_key_exists($_GET['lot_id'], $items);
 
 if (!$idIsValid) {
@@ -19,8 +21,8 @@ if (!$idIsValid) {
         <link href="css/style.css" rel="stylesheet">
     </head>
     <body>
-    <?= includeTemplate('templates/header.php', ['user_name' => $_SESSION['user']]); ?>
-    <?= includeTemplate('templates/lot-main.php', ['bets' => $bets, 'equip_item' => $items[$_GET['lot_id']]]); ?>
+    <?= includeTemplate('templates/header.php'); ?>
+    <?= includeTemplate('templates/lot-main.php', ['bets' => $bets, 'equip_item' => $items[$_GET['lot_id']], 'id' => $_GET['lot_id']]); ?>
     <?= includeTemplate('templates/footer.php'); ?>
     </body>
     </html>

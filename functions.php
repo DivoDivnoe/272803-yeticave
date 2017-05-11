@@ -157,8 +157,7 @@ function checkLotForm($checkedFields) {
     return '';
 }
 
-function authUser($email, $pass) {
-    global $users;
+function authUser($email, $pass, $users) {
     $class = 'form__item--invalid';
     $error = 'Комбинация пользователь - пароль неверна';
 
@@ -168,8 +167,23 @@ function authUser($email, $pass) {
             $_SESSION['user'] = $user['name'];
             $class = '';
             $error = '';
+            break;
         }
     }
 
     return ['class' => $class, 'error' => $error];
+}
+
+function addBet() {
+    if (isset($_POST['cost'])) {
+        date_default_timezone_set('Europe/Moscow');
+
+        $bet_data = ['cost' => $_POST['cost'], 'date' => time()];
+        $bet_data = json_encode($bet_data);
+        $expire = strtotime('+1 year');
+
+        header('Location: mylots.php');
+        setcookie("my_bets[{$_POST['lot_id']}]", $bet_data, $expire, '/');
+        exit;
+    }
 }
