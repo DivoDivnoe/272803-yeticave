@@ -6,15 +6,18 @@ require 'functions.php';
 
 date_default_timezone_set('Europe/Moscow');
 $cost_post = checkNumberInput('cost');
-$id_get = $_GET['lot_id'];
+$idIsValid = false;
 
-if (isset($_POST['cost']) && !$cost_post['error']) {
-    addBet($_POST['cost'], $id_get);
-    header('Location: mylots.php');
-    exit;
+if (isset($_GET['lot_id'])) {
+    $id_get = $_GET['lot_id'];
+
+    if (isset($_POST['cost']) && !$cost_post['error']) {
+        addBet($_POST['cost'], $id_get);
+        header('Location: mylots.php');
+        exit;
+    }
+    $idIsValid = array_key_exists($id_get, $items);
 }
-
-$idIsValid = isset($id_get) && array_key_exists($id_get, $items);
 
 if (!$idIsValid) {
     header('HTTP/1.1 404 Not Found');
