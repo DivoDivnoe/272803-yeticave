@@ -1,5 +1,7 @@
 <?php
 
+require_once 'mysql_helper.php';
+
 function includeTemplate($path, $data = []) {
     if (!file_exists($path)) {
         return '';
@@ -180,4 +182,43 @@ function addBet($bet, $lot_id) {
     $expire = strtotime('+1 year');
 
     setcookie("my_bets[{$lot_id}]", $bet_data, $expire, '/');
+}
+
+function get_data_from_db($link, $query, $data = []) {
+    $result = mysqli_stmt_execute(db_get_prepare_stmt($link, $query, $data));
+
+    return ($result ? mysqli_fetch_all(mysqli_use_result($link), MYSQLI_ASSOC) : []);
+}
+
+function insert_data_to_db($link, $query, $data) {
+    $result = mysqli_stmt_execute(db_get_prepare_stmt($link, $query, $data));
+
+    return ($result ? mysqli_insert_id($link) : $result);
+}
+
+function update_db_data($link, $table, $data, $where_data) {
+    $where_columns = array_keys($where_data);
+    $count = 0;
+
+    foreach ($data as $index => $field) {
+        $query = "UPDATE $table";
+
+        foreach ($field as $column => $value) {
+            $query .= " SET $column = ?,";
+        }
+
+        $query = substr($query, 0, -1);
+        $where_column = $where_columns[$index];
+        $query .= " WHERE $where_column = ?;\n";
+        $merged_data = array_merge($field, array_slice($where_data, $index, 1));
+        $result = mysqli_stmt_execute(db_get_prepare_stmt($link, $query, $merged_data));
+
+        if (!$result) {
+            return $result;
+        } else {
+            $count++;
+        }
+    }
+
+    return $count;
 }
