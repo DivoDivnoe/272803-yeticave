@@ -13,7 +13,7 @@ CREATE TABLE users (
   email VARCHAR(63) UNIQUE NOT NULL,
   name VARCHAR(63) NOT NULL,
   password VARCHAR(63) NOT NULL,
-  avatar VARCHAR(63) UNIQUE,
+  avatar VARCHAR(63),
   contacts VARCHAR(255)
 )ENGINE=InnoDB;
 
