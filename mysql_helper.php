@@ -20,7 +20,7 @@ function db_get_prepare_stmt($link, $sql, $data = []) {
             $type = null;
 
             if (is_int($value)) {
-                $type = 'd';
+                $type = 'i';
             }
             else if (is_string($value)) {
                 $type = 's';

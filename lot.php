@@ -22,7 +22,20 @@ if (isset($_GET['lot_id'])) {
 if (!$idIsValid) {
     header('HTTP/1.1 404 Not Found');
     exit;
-}?>
+}
+
+$connection = mysqli_connect('localhost', 'root', '', 'yeticave');
+if (mysqli_connect_errno()) {
+    exit("Ошибка соединения с базой данных. " . mysqli_connect_error());
+}
+
+$query = "SELECT `name` FROM `categories` ORDER BY `id`;";
+
+$categories = get_data_from_db($connection, $query);
+if (!$categories) {
+    exit('Ошибка запроса к базе данных. ' . mysqli_error($connection));
+}
+?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -33,7 +46,7 @@ if (!$idIsValid) {
 </head>
 <body>
 <?= includeTemplate('templates/header.php'); ?>
-<?= includeTemplate('templates/lot-main.php', ['bets' => $bets, 'equip_item' => $items[$id_get], 'id' => $id_get, 'cost' => $cost_post]); ?>
-<?= includeTemplate('templates/footer.php'); ?>
+<?= includeTemplate('templates/lot-main.php', ['bets' => $bets, 'equip_item' => $items[$id_get], 'id' => $id_get, 'cost' => $cost_post, 'categories' => $categories]); ?>
+<?= includeTemplate('templates/footer.php', ['categories' => $categories]); ?>
 </body>
 </html>

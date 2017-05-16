@@ -61,6 +61,14 @@ function formatTime($ts) {
     return $result_str;
 }
 
+/*function show_left_time($time) {
+    $ts = strtotime($time);
+
+    $left_time = date('m месяцев d дней H:i:s', $ts - time());
+
+    return $left_time;
+}*/
+
 function checkTextInput($text) {
     $class = '';
     $error = '';
@@ -185,9 +193,10 @@ function addBet($bet, $lot_id) {
 }
 
 function get_data_from_db($link, $query, $data = []) {
-    $result = mysqli_stmt_execute(db_get_prepare_stmt($link, $query, $data));
+    $stmt = db_get_prepare_stmt($link, $query, $data);
+    $result = mysqli_stmt_execute($stmt);
 
-    return ($result ? mysqli_fetch_all(mysqli_use_result($link), MYSQLI_ASSOC) : []);
+    return ($result ? mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC) : []);
 }
 
 function insert_data_to_db($link, $query, $data) {
@@ -198,27 +207,30 @@ function insert_data_to_db($link, $query, $data) {
 
 function update_db_data($link, $table, $data, $where_data) {
     $where_columns = array_keys($where_data);
-    $count = 0;
+    $result_or_count = 0;
 
     foreach ($data as $index => $field) {
-        $query = "UPDATE $table";
+        $query = "UPDATE $table SET";
 
         foreach ($field as $column => $value) {
-            $query .= " SET $column = ?,";
+            $query .= " $column = ?,";
         }
 
-        $query = substr($query, 0, -1);
+        $query = rtrim($query, ',');
         $where_column = $where_columns[$index];
         $query .= " WHERE $where_column = ?;\n";
         $merged_data = array_merge($field, array_slice($where_data, $index, 1));
-        $result = mysqli_stmt_execute(db_get_prepare_stmt($link, $query, $merged_data));
+        $stmt = db_get_prepare_stmt($link, $query, $merged_data);
+        $result = mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
 
         if (!$result) {
-            return $result;
+            $result_or_count = false;
+            break;
         } else {
-            $count++;
+            $result_or_count++;
         }
     }
 
-    return $count;
+    return $result_or_count;
 }
