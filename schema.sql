@@ -16,7 +16,7 @@ CREATE TABLE users (
   name VARCHAR(63) NOT NULL,
   password VARCHAR(63) NOT NULL,
   avatar VARCHAR(63),
-  contacts VARCHAR(255)
+  contacts VARCHAR(255) NOT NULL
 )ENGINE=InnoDB;
 
 CREATE TABLE lots (
@@ -28,7 +28,7 @@ CREATE TABLE lots (
   title VARCHAR(127) NOT NULL,
   description TEXT(1023) NOT NULL,
   image VARCHAR(63) UNIQUE NOT NULL,
-  start_price DECIMAL(8,2) NOT NULL,
+  start_price INT NOT NULL,
   expire DATETIME NOT NULL,
   step INT NOT NULL,
   added_to_favorites INT,
@@ -42,7 +42,7 @@ CREATE TABLE bets (
   user_id INT NOT NULL,
   lot_id INT NOT NULL,
   date DATETIME NOT NULL,
-  sum DECIMAL(8,2) NOT NULL,
+  sum INT NOT NULL,
   FOREIGN KEY(user_id) REFERENCES users(id),
   FOREIGN KEY(lot_id) REFERENCES lots(id)
 )ENGINE=InnoDB;

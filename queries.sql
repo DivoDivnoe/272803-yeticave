@@ -2,16 +2,16 @@
 SELECT `name` FROM `categories`;
 
 -- Получение открытых лотов. Каждый лот должен включать название, стартовую цену, ссылку на изображение, цену, количество ставок, название категории
-SELECT `title`, `start_price`, `image`, `sum`, COUNT(*) AS `num_of_bets`, `name` FROM `lots`
-INNER JOIN `bets` ON `bets`.`lot_id` = `lots`.`id`
+SELECT `lots`.`title`, `lots`.`start_price`, `lots`.`image`, CASE WHEN MAX(`bets`.`sum`) IS NULL THEN `lots`.`start_price` ELSE MAX(`bets`.`sum`)END as `price`, COUNT(`bets`.`id`) AS `num_of_bets`, `categories`.`name` FROM `lots`
+LEFT JOIN `bets` ON `bets`.`lot_id` = `lots`.`id`
 INNER JOIN `categories` ON `bets`.`category_id` = `categories`.`id`
-WHERE expire > NOW()
-GROUP BY `title`
-ORDER BY `expire` DESC;
+WHERE `lots`.expire > NOW()
+GROUP BY `lots`.`title`
+ORDER BY `lots`.`expire` DESC;
 
 -- Найти лот по его названию или описанию
 SELECT * FROM `lots`
-WHERE `title` LIKE '%сноуборд%' OR `description` LIKE '%легкий%маневренный%';
+WHERE `title` LIKE '%сноуборд%' OR `description` LIKE '%сноуборд%';
 
 -- Добавление нового лота
 INSERT INTO `lots` (`title`, `category_id`, `author_id`, `register_date`, `description`, `image`, `start_price`, `step`, `expire`)

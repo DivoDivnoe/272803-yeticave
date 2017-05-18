@@ -13,25 +13,16 @@
         <div class="lot-item__content">
             <div class="lot-item__left">
                 <div class="lot-item__image">
-                    <img src="<?= $equip_item['url'] ?>" width="730" height="548" alt="Сноуборд">
+                    <img src="<?= $equip_item['image'] ?>" width="730" height="548" alt="Сноуборд">
                 </div>
-                <p class="lot-item__category">Категория: <span><?= $equip_item['category'] ?></span></p>
-                <p class="lot-item__description">Легкий маневренный сноуборд, готовый дать жару в любом парке, растопив
-                    снег
-                    мощным щелчкоми четкими дугами. Стекловолокно Bi-Ax, уложенное в двух направлениях, наделяет этот
-                    снаряд
-                    отличной гибкостью и отзывчивостью, а симметричная геометрия в сочетании с классическим прогибом
-                    кэмбер
-                    позволит уверенно держать высокие скорости. А если к концу катального дня сил совсем не останется,
-                    просто
-                    посмотрите на Вашу доску и улыбнитесь, крутая графика от Шона Кливера еще никого не оставляла
-                    равнодушным.</p>
+                <p class="lot-item__category">Категория: <span><?= $equip_item['name'] ?></span></p>
+                <p class="lot-item__description"><?= htmlspecialchars($equip_item['description']) ?></p>
             </div>
             <div class="lot-item__right">
-                <?php if (isset($_SESSION['user']) && !isset($_COOKIE['my_bets'][$id])): ?>
+                <?php if (isset($_SESSION['user']) && !$my_bet): ?>
                     <div class="lot-item__state">
                         <div class="lot-item__timer timer">
-                            10:54:12
+                            <?= show_left_time(htmlspecialchars($equip_item['expire'])); ?>
                         </div>
                         <div class="lot-item__cost-state">
                             <div class="lot-item__rate">
@@ -39,14 +30,13 @@
                                 <span class="lot-item__cost"><?= $equip_item['price'] ?></span>
                             </div>
                             <div class="lot-item__min-cost">
-                                Мин. ставка <span>12 000 р</span>
+                                Мин. ставка <span><?= $equip_item['price'] + $equip_item['step'] ?> р</span>
                             </div>
                         </div>
-                        <form class="lot-item__form" action="lot.php?lot_id=<?= $id ?>" method="post">
+                        <form class="lot-item__form" action="lot.php?lot_id=<?= $equip_item['id'] ?>" method="post">
                             <p class="lot-item__form-item <?= $cost['class'] ?>">
                                 <label for="cost">Ваша ставка</label>
-                                <input type="hidden" name="lot_id" value="<?= $id ?>">
-                                <input id="cost" type="number" name="cost" placeholder="12 000">
+                                <input id="cost" type="number" name="cost" placeholder="<?= $equip_item['price'] + $equip_item['step'] ?>">
                                 <span class="form__error"><?= $cost['error'] ?></span>
                             </p>
                             <button type="submit" class="button">Сделать ставку</button>
@@ -54,9 +44,17 @@
                     </div>
                 <?php endif; ?>
                 <div class="history">
-                    <h3>История ставок (<span>4</span>)</h3>
+                    <h3>История ставок</h3>
                     <!-- заполните эту таблицу данными из массива $bets-->
-                    <?php include 'history_list_block.php' ?>
+                    <table class="history__list">
+                        <?php foreach ($bets as $bet): ?>
+                            <tr class="history__item">
+                                <td class="history__name"><?= htmlspecialchars($bet['name']) ?></td>
+                                <td class="history__price"><?= $bet['sum'] . ' р.' ?></td>
+                                <td class="history__time"><?= ts2relative(strtotime($bet['date'])) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </table>
                 </div>
             </div>
         </div>

@@ -24,13 +24,12 @@ function my_strip_tags($data) {
 
 function ts2relative($ts) {
     $twenty_four_hours = 24 * 60 * 60;
-
     $dif = time() - $ts;
 
     if ($dif > $twenty_four_hours) {
         $date = date('d.m.y в H:i' , $ts);
     }  else {
-        $date = formatTime($dif);
+        $date = formatTime($dif) . ' назад';
     }
 
     return $date;
@@ -38,8 +37,12 @@ function ts2relative($ts) {
 
 function formatTime($ts) {
     $one_hour = 60 * 60;
+    $twenty_four_hours = 24 * 60 * 60;
 
-    if ($ts >= $one_hour) {
+    if ($ts > $twenty_four_hours) {
+        $timeString = ['дней', 'день', 'дня'];
+        $date = (string) ceil($ts / $twenty_four_hours);
+    } elseif ($ts >= $one_hour) {
         $timeString = ['часов', 'час', 'часа'];
         $date = gmdate('H', $ts);
     } else {
@@ -51,23 +54,34 @@ function formatTime($ts) {
     $last_chars = ['1', '2', '3', '4'];
 
     if (!in_array($last_char, $last_chars) || $first_char === '1') {
-        $result_str = $date .  ' ' . $timeString[0] . ' назад';
+        $result_str = $date .  ' ' . $timeString[0];
     } else if ($last_char === '1') {
-        $result_str = $date .  ' ' . $timeString[1] . ' назад';
+        $result_str = $date .  ' ' . $timeString[1];
     } else {
-        $result_str = $date .  ' ' . $timeString[2] . ' назад';
+        $result_str = $date .  ' ' . $timeString[2];
     }
 
     return $result_str;
 }
 
-/*function show_left_time($time) {
+function show_left_time($time) {
     $ts = strtotime($time);
+    $ts_left = $ts - time();
+    $twenty_four_hours = 24 * 60 * 60;
 
-    $left_time = date('m месяцев d дней H:i:s', $ts - time());
+    if ($ts < $twenty_four_hours) {
+        $left_time = date('H:i', $ts_left);
+    } else {
+        $left_time = formatTime($ts_left);
+    }
 
     return $left_time;
-}*/
+}
+
+function send_header($text) {
+    header($text);
+    exit;
+}
 
 function checkTextInput($text) {
     $class = '';
@@ -175,6 +189,7 @@ function authUser($email, $pass, $users) {
         if ($user['email'] === $email && password_verify($pass, $user['password'])) {
             session_start();
             $_SESSION['user'] = $user['name'];
+            $_SESSION['email'] = $user['email'];
             $class = '';
             $error = '';
             break;
@@ -233,4 +248,20 @@ function update_db_data($link, $table, $data, $where_data) {
     }
 
     return $result_or_count;
+}
+
+function connect_to_db($host, $user, $password, $db) {
+    $connection = mysqli_connect($host, $user, $password, $db);
+
+    if (mysqli_connect_errno()) {
+        exit("Ошибка соединения с базой данных. " . mysqli_connect_error());
+    }
+
+    return $connection;
+}
+
+function check_query_result($connection, $result) {
+    if (!$result) {
+        exit('Ошибка запроса к базе данных. ' . mysqli_error($connection));
+    }
 }

@@ -1,6 +1,5 @@
 <?php
 
-require_once 'lots_array.php';
 require_once 'functions.php';
 
 // устанавливаем часовой пояс в Московское время
@@ -33,7 +32,8 @@ if (!$categories) {
 
 $query_lots = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.`description`, `lots`.`image`, `lots`.`start_price`, `lots`.`expire`, `categories`.`name` FROM `lots` 
                INNER JOIN `categories` ON `categories`.`id` = `lots`.`category_id`
-               ORDER BY `lots`.`id`;";
+               WHERE `lots`.`expire` > NOW()
+               ORDER BY `lots`.`register_date` DESC;";
 $lots = get_data_from_db($connection, $query_lots);
 if (!$lots) {
     exit('Ошибка запроса к базе данных. ' . mysqli_error($connection));
@@ -59,3 +59,5 @@ session_start();
 <?= includeTemplate('templates/footer.php', ['categories' => $categories]); ?>
 </body>
 </html>
+
+<?php mysqli_close($connection); ?>

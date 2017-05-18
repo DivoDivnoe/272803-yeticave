@@ -11,6 +11,10 @@
  */
 function db_get_prepare_stmt($link, $sql, $data = []) {
     $stmt = mysqli_prepare($link, $sql);
+    
+    if(!$stmt) {
+        exit("Ошибка подготовки запроса: " . mysqli_error($link));
+    }
 
     if ($data) {
         $types = '';
