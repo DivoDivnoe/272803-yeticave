@@ -1,6 +1,5 @@
 <?php
 
-require_once 'mysql_helper.php';
 
 function includeTemplate($path, $data = []) {
     if (!file_exists($path)) {
@@ -100,24 +99,67 @@ function checkTextInput($text) {
     return ['class' => $class, 'error' => $error, 'value' => $value];
 }
 
-function checkSelectInput($name) {
+function check_email($email) {
     $class = '';
     $error = '';
-    $options = ['Выберите категорию' => '', 'Доски и лыжи' => '', 'Крепления' => '', 'Ботинки' => '', 'Одежда' => '', 'Инструменты' => '', 'Разное' => ''];
-    $value = array_keys($options)[0];
+    $value = '';
+
+    if (isset($_POST[$email])) {
+        $value = filter_var($_POST[$email], FILTER_VALIDATE_EMAIL);
+
+        if (!$value) {
+            $class = 'form__item--invalid';
+            $error = 'Неверный формат email';
+        }
+    }
+
+    return ['class' => $class, 'error' => $error, 'value' => $value];
+}
+
+function check_email_in_db($connection, $email) {
+    $query = "SELECT `email` FROM `users`";
+    $email_list = get_data_from_db($connection, $query);
+
+    foreach ($email_list as $email_field) {
+        if ($email === $email_field['email']) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function check_pass_in_db($connection, $password) {
+    $query = "SELECT `password` FROM `users`";
+    $password_list = get_data_from_db($connection, $query);
+
+    foreach ($password_list as $password_field) {
+        if (password_verify($password, $password_field['password'])) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function checkSelectInput($name, $options) {
+    $class = '';
+    $error = '';
+    $selected = 0;
+    $value = $options[$selected];
 
     if (isset($_POST[$name])) {
         $value = $_POST[$name];
 
-        if ($value === array_keys($options)[0]) {
+        if ($value === $options[0]) {
             $class = 'form__item--invalid';
             $error = 'Выберите значение';
         } else {
-            $options[$value] = 'selected';
+            $selected = array_search($value, $options);
         }
     }
 
-    return ['class' => $class, 'error' => $error, 'value' => $value, 'options' => $options];
+    return ['class' => $class, 'error' => $error, 'value' => $value, 'options' => $options, 'selected' => $selected];
 }
 
 function checkNumberInput($num) {
@@ -145,21 +187,25 @@ function checkNumberInput($num) {
     return ['class' => $class, 'error' => $error, 'value' => $value];
 }
 
-function checkFileInput($user_file) {
+function checkFileInput($user_file, $image_folder, $required = false) {
     $class = '';
     $error = '';
+    $url = null;
 
     if (isset($_FILES[$user_file])) {
         $file = $_FILES[$user_file];
-        $class = 'form__item--invalid';
 
-        if (!$file['name']) {
+        if ($required && !$file['name']) {
             $error =  'Выберите изображение лота';
+            $class = 'form__item--invalid';
         }
 
         if (is_uploaded_file($file['tmp_name'])) {
-            if (move_uploaded_file($file['tmp_name'], "img/{$file['name']}")) {
+            $class = 'form__item--invalid';
+
+            if (move_uploaded_file($file['tmp_name'], "$image_folder/{$file['name']}")) {
                 $class = '';
+                $url = "$image_folder/{$file['name']}";
             } else {
                 $error = 'Ошибка при перемещении загруженного файла';
             }
@@ -168,7 +214,33 @@ function checkFileInput($user_file) {
         }
     }
 
-    return ['class' => $class, 'error' => $error];
+    return ['class' => $class, 'error' => $error, 'url' => $url];
+}
+
+function check_date($date) {
+    $class = '';
+    $error = '';
+    $value = '';
+
+    if (isset($_POST[$date])) {
+        $value = $_POST[$date];
+
+        if (!$value) {
+            $class = 'form__item--invalid';
+            $error = 'Заполните это поле';
+        } else {
+            $date_array = explode('.', $value);
+            $date_is_valid = checkdate($date_array[1], $date_array[0], $date_array[2]) && strtotime($value) > strtotime('today midnight');
+
+            if (!$date_is_valid) {
+                $class = 'form__item--invalid';
+                $error = 'Введите корректную дату';
+            }
+        }
+    }
+
+    return ['class' => $class, 'error' => $error, 'value' => $value];
+
 }
 
 function checkLotForm($checkedFields) {
@@ -181,20 +253,44 @@ function checkLotForm($checkedFields) {
     return '';
 }
 
-function authUser($email, $pass, $users) {
+function auth_user($connection, $email, $pass) {
     $class = 'form__item--invalid';
     $error = 'Комбинация пользователь - пароль неверна';
 
-    foreach ($users as $index => $user) {
-        if ($user['email'] === $email && password_verify($pass, $user['password'])) {
-            session_start();
-            $_SESSION['user'] = $user['name'];
-            $_SESSION['email'] = $user['email'];
-            $class = '';
-            $error = '';
-            break;
-        }
+    if (check_email_in_db($connection, $email) && check_pass_in_db($connection, $pass)) {
+        $query = "SELECT `name` FROM `users` WHERE `email` = ?";
+        $email = $_POST['email'];
+        $result = get_data_from_db($connection, $query, [$email]);
+        check_query_result($connection, $result);
+
+        session_start();
+        $_SESSION['user'] = $result[0]['name'];
+        $_SESSION['email'] = $email;
+        $class = '';
+        $error = '';
     }
+
+    return ['class' => $class, 'error' => $error];
+}
+
+function register_user($link, $data, $has_avatar = false) {
+    $class = 'form__item--invalid';
+    $error = 'Пользователь с таким email уже зарегистрирован';
+
+    $email_in_db = check_email_in_db($link, $data[1]);
+    if ($email_in_db) {
+        $class = '';
+        $error = '';
+    }
+
+    if ($has_avatar) {
+        $query = "INSERT INTO `users` (`register_date`, `email`, `name`, `password`, `avatar`, `contacts`) VALUES (NOW(), ?, ?, ?, ?, ?);";
+    } else {
+        $query = "INSERT INTO `users` (`register_date`, `email`, `name`, `password`, `contacts`) VALUES (NOW(), ?, ?, ?, ?);";
+    }
+
+    $result = insert_data_to_db($link, $query, $data);
+    check_query_result($link, $result);
 
     return ['class' => $class, 'error' => $error];
 }
@@ -207,6 +303,54 @@ function addBet($bet, $lot_id) {
     setcookie("my_bets[{$lot_id}]", $bet_data, $expire, '/');
 }
 
+
+/**
+ * Создает подготовленное выражение на основе готового SQL запроса и переданных данных
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param $sql string SQL запрос с плейсхолдерами вместо значений
+ * @param array $data Данные для вставки на место плейсхолдеров
+ *
+ * @return mysqli_stmt Подготовленное выражение
+ */
+function db_get_prepare_stmt($link, $sql, $data = []) {
+    $stmt = mysqli_prepare($link, $sql);
+
+    if(!$stmt) {
+        exit("Ошибка подготовки запроса: " . mysqli_error($link));
+    }
+
+    if ($data) {
+        $types = '';
+        $stmt_data = [];
+
+        foreach ($data as $value) {
+            $type = null;
+
+            if (is_int($value)) {
+                $type = 'i';
+            }
+            else if (is_string($value)) {
+                $type = 's';
+            }
+            else if (is_double($value)) {
+                $type = 'd';
+            }
+
+            if ($type) {
+                $types .= $type;
+                $stmt_data[] = $value;
+            }
+        }
+
+        $values = array_merge([$stmt, $types], $stmt_data);
+        $func = 'mysqli_stmt_bind_param';
+        $func(...$values);
+    }
+
+    return $stmt;
+}
+
 function get_data_from_db($link, $query, $data = []) {
     $stmt = db_get_prepare_stmt($link, $query, $data);
     $result = mysqli_stmt_execute($stmt);
@@ -216,7 +360,6 @@ function get_data_from_db($link, $query, $data = []) {
 
 function insert_data_to_db($link, $query, $data) {
     $result = mysqli_stmt_execute(db_get_prepare_stmt($link, $query, $data));
-
     return ($result ? mysqli_insert_id($link) : $result);
 }
 
@@ -256,6 +399,9 @@ function connect_to_db($host, $user, $password, $db) {
     if (mysqli_connect_errno()) {
         exit("Ошибка соединения с базой данных. " . mysqli_connect_error());
     }
+    
+    $result = mysqli_query($connection, 'SET NAMES utf8');
+    check_query_result($connection, $result);
 
     return $connection;
 }

@@ -2,7 +2,9 @@
 
 require_once 'functions.php';
 
-if (isset($_SESSION['name'])) {
+session_start();
+
+if (isset($_SESSION['user'])) {
     send_header('Location: http://yeticave/index.php');
 }
 
@@ -12,12 +14,22 @@ $query = "SELECT `name` FROM `categories` ORDER BY `id`;";
 $categories = get_data_from_db($connection, $query);
 check_query_result($connection, $categories);
 
-$email_post = checkTextInput('email');
+$email_post = check_email($connection, 'email', false);
 $password_post = checkTextInput('password');
 $name_post = checkTextInput('name');
 $contacts_post = checkTextInput('message');
-$avatar_post = checkFileInput('user_file');
+$avatar_post = checkFileInput('user_file', 'avatar');
 $validate_form = checkLotForm([$email_post, $password_post, $name_post, $contacts_post, $avatar_post]);
+
+if (isset($_POST['submit']) && !$validate_form) {
+    $data = ['email' => $_POST['email'], 'name' => $_POST['name'], 'password' => password_hash($_POST['password'], PASSWORD_DEFAULT), 'avatar' => $avatar_post['url'], 'contacts' => $_POST['message']];
+    $has_avatar = $avatar_post['url'] ? true : false;
+    $register_result = register_user($connection, $data, $has_avatar);
+
+    if (!$register_result['error']) {
+        send_header('Location: http://yeticave/login.php');
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -29,18 +41,12 @@ $validate_form = checkLotForm([$email_post, $password_post, $name_post, $contact
 </head>
 <body>
 <?= includeTemplate('templates/header.php'); ?>
-<?php if (!isset($_POST['submit']) || $validate_form): ?>
-    <?= includeTemplate('templates/register_main.php', [ 'email' => $email_post,
+<?= includeTemplate('templates/register_main.php', [ 'email' => $email_post,
         'password' => $password_post,
         'name' => $name_post,
         'user_file' => $avatar_post,
         'contacts' => $contacts_post,
         'form_class' => $validate_form ]); ?>
-<?php else:
-    session_start();
-    $_SESSION['user'] = $_POST['name'];
-    $_SESSION['email'] = $_POST['email'];
-endif; ?>
 <?= includeTemplate('templates/footer.php', ['categories' => $categories]); ?>
 </body>
 </html>

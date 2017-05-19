@@ -22,7 +22,6 @@ $query_bets = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.
                WHERE `users`.`email` = ?
                ORDER BY `bets`.`date` DESC;";
 $bets = get_data_from_db($connection, $query_bets, [$_SESSION['email']]);
-check_query_result($connection, $bets);
 ?>
 
 <!DOCTYPE html>

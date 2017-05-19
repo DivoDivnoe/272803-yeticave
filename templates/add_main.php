@@ -1,24 +1,11 @@
 <main>
     <nav class="nav">
         <ul class="nav__list container">
-            <li class="nav__item">
-                <a href="all-lots.html">Доски и лыжи</a>
-            </li>
-            <li class="nav__item">
-                <a href="all-lots.html">Крепления</a>
-            </li>
-            <li class="nav__item">
-                <a href="all-lots.html">Ботинки</a>
-            </li>
-            <li class="nav__item">
-                <a href="all-lots.html">Одежда</a>
-            </li>
-            <li class="nav__item">
-                <a href="all-lots.html">Инструменты</a>
-            </li>
-            <li class="nav__item">
-                <a href="all-lots.html">Разное</a>
-            </li>
+            <?php foreach ($categories as $index => $category): ?>
+                <li class="nav__item">
+                    <a href="all-lots.html"><?= $category['name'] ?></a>
+                </li>
+            <?php endforeach; ?>
         </ul>
     </nav>
     <form class="form form--add-lot container <?= $form_class ?>" action="../add.php" method="post" enctype="multipart/form-data"> <!-- form--invalid -->
@@ -29,14 +16,15 @@
                 <input id="lot-name" type="text" name="lot-name" value="<?= $title['value'] ?>" placeholder="Введите наименование лота">
                 <span class="form__error"><?= $title['error'] ?></span>
             </div>
-            <div class="form__item <?= $category['class'] ?>">
+            <div class="form__item <?= $category_input['class'] ?>">
                 <label for="category">Категория</label>
-                <select id="category" name="category" value="<?= $category['value'] ?>">
-                    <?php foreach ($category['options'] as $option => $selected): ?>
-                        <option <?= $selected ?>><?= $option ?></option>
+                <select id="category" name="category" value="<?= $category_input['value'] ?>">
+                    <?php foreach ($category_input['options'] as $index => $option): ?>
+
+                        <option <?= ($index === $category_input['selected'] ? 'selected' : '') ?>><?= $option ?></option>
                     <?php endforeach; ?>
                 </select>
-                <span class="form__error"><?= $category['error'] ?></span>
+                <span class="form__error"><?= $category_input['error'] ?></span>
             </div>
         </div>
         <div class="form__item form__item--wide <?= $message['class'] ?>">

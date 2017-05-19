@@ -18,28 +18,22 @@ $now = time();
 
 $lot_time_remaining = gmdate('H:i', $tomorrow - $now);
 
-$connection = mysqli_connect('localhost', 'root', '', 'yeticave');
-if (mysqli_connect_errno()) {
-    exit("Ошибка соединения с базой данных. " . mysqli_connect_error());
-}
+$connection = connect_to_db('localhost', 'root', '', 'yeticave');
 
 $query_categories = "SELECT * FROM `categories` ORDER BY `id`;";
 
 $categories = get_data_from_db($connection, $query_categories);
-if (!$categories) {
-    exit('Ошибка запроса к базе данных. ' . mysqli_error($connection));
-}
+check_query_result($connection, $categories);
 
 $query_lots = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.`description`, `lots`.`image`, `lots`.`start_price`, `lots`.`expire`, `categories`.`name` FROM `lots` 
                INNER JOIN `categories` ON `categories`.`id` = `lots`.`category_id`
                WHERE `lots`.`expire` > NOW()
                ORDER BY `lots`.`register_date` DESC;";
 $lots = get_data_from_db($connection, $query_lots);
-if (!$lots) {
-    exit('Ошибка запроса к базе данных. ' . mysqli_error($connection));
-}
+check_query_result($connection, $lots);
 
 session_start();
+
 ?>
 <!DOCTYPE html>
 <html lang="ru">
