@@ -42,7 +42,7 @@ if (isset($_POST['submit']) && !$validate_form) {
     $author_id = get_data_from_db($connection, $query_author_id, [$_SESSION['email']]);
     check_query_result($connection, $author_id);
 
-    $data = [$lot_category[0]['id'], $author_id[0]['id'], $_POST['lot-name'], $_POST['message'], $user_file_post['url'], $_POST['lot-rate'], $_POST['lot-date'], $_POST['lot-step']];
+    $data = [$lot_category[0]['id'], $author_id[0]['id'], $_POST['lot-name'], $_POST['message'], $user_file_post['url'], $_POST['lot-rate'], date('Y-m-d H:i:s' ,strtotime($_POST['lot-date'])), $_POST['lot-step']];
 
     $query = "INSERT INTO `lots` (`category_id`, `author_id`, `register_date`, `title`, `description`, `image`, `start_price`, `expire`, `step`) 
               VALUES (?, ?, NOW(), ?, ?, ?, ?, ?, ?);";

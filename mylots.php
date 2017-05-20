@@ -15,7 +15,7 @@ $query = "SELECT `name` FROM `categories` ORDER BY `id`;";
 $categories = get_data_from_db($connection, $query);
 check_query_result($connection, $categories);
 
-$query_bets = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.`expire`, `categories`.`name`, `bets`.`sum`, `bets`.`date` FROM `lots` 
+$query_bets = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.`expire`, `categories`.`name`, `bets`.`sum`, `bets`.`date`, `lots`.`image` FROM `lots` 
                INNER JOIN `categories` ON `categories`.`id` = `lots`.`category_id`
                INNER JOIN `bets` ON `bets`.`lot_id` = `lots`.`id`
                INNER JOIN `users` ON `bets`.`user_id` = `users`.`id`
@@ -34,7 +34,7 @@ $bets = get_data_from_db($connection, $query_bets, [$_SESSION['email']]);
 </head>
 <body>
 <?= includeTemplate('templates/header.php'); ?>
-<?= includeTemplate('templates/my_lots_main.php', ['my_bets' => $bets]); ?>
+<?= includeTemplate('templates/my_lots_main.php', ['my_bets' => $bets, 'categories' => $categories]); ?>
 <?= includeTemplate('templates/footer.php', ['categories' => $categories]); ?>
 </body>
 </html>

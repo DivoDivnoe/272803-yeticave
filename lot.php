@@ -62,6 +62,8 @@ check_query_result($connection, $categories);
 $query_made_bet = "SELECT * FROM `bets` WHERE `user_id` = ? AND `lot_id` = ?";
 $my_bet = get_data_from_db($connection, $query_made_bet, [$user_id, $id_get]);
 
+$query_is_my_lot = "SELECT * FROM `lots` WHERE `author_id` = ? AND `id` = ?;";
+$is_my_lot = get_data_from_db($connection, $query_is_my_lot, [$user_id, $id_get]);
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -73,7 +75,7 @@ $my_bet = get_data_from_db($connection, $query_made_bet, [$user_id, $id_get]);
 </head>
 <body>
 <?= includeTemplate('templates/header.php'); ?>
-<?= includeTemplate('templates/lot-main.php', ['bets' => $bets, 'equip_item' => $lots[0], 'cost' => $cost_post, 'categories' => $categories, 'my_bet' => $my_bet]); ?>
+<?= includeTemplate('templates/lot-main.php', ['bets' => $bets, 'equip_item' => $lots[0], 'cost' => $cost_post, 'categories' => $categories, 'my_bet' => $my_bet, 'is_my_lot' => $is_my_lot]); ?>
 <?= includeTemplate('templates/footer.php', ['categories' => $categories]); ?>
 </body>
 </html>

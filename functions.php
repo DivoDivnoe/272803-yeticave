@@ -64,11 +64,10 @@ function formatTime($ts) {
 }
 
 function show_left_time($time) {
-    $ts = strtotime($time);
-    $ts_left = $ts - time();
+    $ts_left = strtotime($time) - time();
     $twenty_four_hours = 24 * 60 * 60;
 
-    if ($ts < $twenty_four_hours) {
+    if ($ts_left < $twenty_four_hours) {
         $left_time = date('H:i', $ts_left);
     } else {
         $left_time = formatTime($ts_left);
@@ -129,19 +128,6 @@ function check_email_in_db($connection, $email) {
     return false;
 }
 
-function check_pass_in_db($connection, $password) {
-    $query = "SELECT `password` FROM `users`";
-    $password_list = get_data_from_db($connection, $query);
-
-    foreach ($password_list as $password_field) {
-        if (password_verify($password, $password_field['password'])) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 function checkSelectInput($name, $options) {
     $class = '';
     $error = '';
@@ -191,6 +177,7 @@ function checkFileInput($user_file, $image_folder, $required = false) {
     $class = '';
     $error = '';
     $url = null;
+    $extensions = ['image/png', 'image/jpeg', 'image/gif', 'image/tiff'];
 
     if (isset($_FILES[$user_file])) {
         $file = $_FILES[$user_file];
@@ -201,13 +188,19 @@ function checkFileInput($user_file, $image_folder, $required = false) {
         }
 
         if (is_uploaded_file($file['tmp_name'])) {
+            $temp_path = $file['tmp_name'];
             $class = 'form__item--invalid';
+            $file_name = generate_unique_name($file['name']);
 
-            if (move_uploaded_file($file['tmp_name'], "$image_folder/{$file['name']}")) {
-                $class = '';
-                $url = "$image_folder/{$file['name']}";
+            if (in_array(mime_content_type($temp_path), $extensions)) {
+                if (move_uploaded_file($temp_path, "$image_folder/$file_name")) {
+                    $class = '';
+                    $url = "$image_folder/$file_name";
+                } else {
+                    $error = 'Ошибка при перемещении загруженного файла';
+                }
             } else {
-                $error = 'Ошибка при перемещении загруженного файла';
+                $error = "Неверное расширение файла!";
             }
         } else {
             $error = "Ошибка {$file['error']} при загрузке файла";
@@ -257,15 +250,14 @@ function auth_user($connection, $email, $pass) {
     $class = 'form__item--invalid';
     $error = 'Комбинация пользователь - пароль неверна';
 
-    if (check_email_in_db($connection, $email) && check_pass_in_db($connection, $pass)) {
-        $query = "SELECT `name` FROM `users` WHERE `email` = ?";
-        $email = $_POST['email'];
-        $result = get_data_from_db($connection, $query, [$email]);
-        check_query_result($connection, $result);
+    $query = "SELECT `email`, `password`, `name`, `avatar` FROM `users` WHERE `email` = ?";
+    $result = get_data_from_db($connection, $query, [$email]);
 
+    if ($result && password_verify($pass, $result[0]['password'])) {
         session_start();
         $_SESSION['user'] = $result[0]['name'];
         $_SESSION['email'] = $email;
+        $_SESSION['avatar'] = $result[0]['avatar'] ? $result[0]['avatar'] : 'user.jpg';
         $class = '';
         $error = '';
     }
@@ -277,20 +269,20 @@ function register_user($link, $data, $has_avatar = false) {
     $class = 'form__item--invalid';
     $error = 'Пользователь с таким email уже зарегистрирован';
 
-    $email_in_db = check_email_in_db($link, $data[1]);
-    if ($email_in_db) {
+    $email_in_db = check_email_in_db($link, $data['email']);
+    if (!$email_in_db) {
         $class = '';
         $error = '';
-    }
 
-    if ($has_avatar) {
-        $query = "INSERT INTO `users` (`register_date`, `email`, `name`, `password`, `avatar`, `contacts`) VALUES (NOW(), ?, ?, ?, ?, ?);";
-    } else {
-        $query = "INSERT INTO `users` (`register_date`, `email`, `name`, `password`, `contacts`) VALUES (NOW(), ?, ?, ?, ?);";
-    }
+        if ($has_avatar) {
+            $query = "INSERT INTO `users` (`register_date`, `email`, `name`, `password`, `avatar`, `contacts`) VALUES (NOW(), ?, ?, ?, ?, ?);";
+        } else {
+            $query = "INSERT INTO `users` (`register_date`, `email`, `name`, `password`, `contacts`) VALUES (NOW(), ?, ?, ?, ?);";
+        }
 
-    $result = insert_data_to_db($link, $query, $data);
-    check_query_result($link, $result);
+        $result = insert_data_to_db($link, $query, $data);
+        check_query_result($link, $result);
+    }
 
     return ['class' => $class, 'error' => $error];
 }
@@ -410,4 +402,31 @@ function check_query_result($connection, $result) {
     if (!$result) {
         exit('Ошибка запроса к базе данных. ' . mysqli_error($connection));
     }
+}
+
+function generate_unique_name($name)
+{
+    $extension = get_extension($name);
+    return md5($name) . time() . '.' . $extension;
+}
+
+function get_extension($filename) {
+    return array_pop(explode('.', $filename));
+}
+
+function search($connection) {
+    $search_get = checkTextInput('search');
+    $search = $_GET['search'];
+    $result = '';
+
+    if (!$search_get['error']) {
+        $query = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.`description`, `lots`.`image`, `lots`.`start_price`, `lots`.`expire`, `categories`.`name` FROM `lots` 
+               INNER JOIN `categories` ON `categories`.`id` = `lots`.`category_id`
+               WHERE `lots`.`expire` > NOW() AND (`lots`.`title` LIKE ? OR `lots`.`description` LIKE ?)
+               ORDER BY `lots`.`register_date` DESC;";
+
+        $result = get_data_from_db($connection, $query, ["%$search%", "%$search%"]);
+    }
+
+    return ['error' => $search_get['error'], 'result' => $result];
 }

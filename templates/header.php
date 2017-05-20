@@ -4,7 +4,7 @@
         <a class="main-header__logo" href="index.php">
             <img src="img/logo.svg" width="160" height="39" alt="Логотип компании YetiCave">
         </a>
-        <form class="main-header__search" method="get" action="https://echo.htmlacademy.ru">
+        <form class="main-header__search" method="get" action=<?= $_SERVER['SCRIPT_NAME'] ?>>
             <input type="search" name="search" placeholder="Поиск лота">
             <input class="main-header__search-btn" type="submit" name="find" value="Найти">
         </form>
@@ -13,7 +13,7 @@
         <nav class="user-menu">
             <?php if (isset($_SESSION['user'])): ?>
             <div class="user-menu__image">
-                <img src="img/user.jpg" width="40" height="40" alt="Пользователь">
+                <img src="img/<?= $_SESSION['avatar'] ?>" width="40" height="40" alt="Пользователь">
             </div>
             <div class="user-menu__logged">
                 <p><?= $_SESSION['user'] ?></p>

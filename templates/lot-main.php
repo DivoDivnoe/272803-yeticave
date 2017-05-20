@@ -19,7 +19,7 @@
                 <p class="lot-item__description"><?= htmlspecialchars($equip_item['description']) ?></p>
             </div>
             <div class="lot-item__right">
-                <?php if (isset($_SESSION['user']) && !$my_bet): ?>
+                <?php if (isset($_SESSION['user']) && !$my_bet && !$is_my_lot): ?>
                     <div class="lot-item__state">
                         <div class="lot-item__timer timer">
                             <?= show_left_time(htmlspecialchars($equip_item['expire'])); ?>
@@ -36,7 +36,7 @@
                         <form class="lot-item__form" action="lot.php?lot_id=<?= $equip_item['id'] ?>" method="post">
                             <p class="lot-item__form-item <?= $cost['class'] ?>">
                                 <label for="cost">Ваша ставка</label>
-                                <input id="cost" type="number" name="cost" placeholder="<?= $equip_item['price'] + $equip_item['step'] ?>">
+                                <input id="cost" type="number" name="cost" min="<?= $equip_item['price'] + $equip_item['step'] ?>" placeholder="<?= $equip_item['price'] + $equip_item['step'] ?>">
                                 <span class="form__error"><?= $cost['error'] ?></span>
                             </p>
                             <button type="submit" class="button">Сделать ставку</button>

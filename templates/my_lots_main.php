@@ -1,24 +1,11 @@
 <main>
     <nav class="nav">
         <ul class="nav__list container">
-            <li class="nav__item">
-                <a href="all-lots.html">Доски и лыжи</a>
-            </li>
-            <li class="nav__item">
-                <a href="all-lots.html">Крепления</a>
-            </li>
-            <li class="nav__item">
-                <a href="all-lots.html">Ботинки</a>
-            </li>
-            <li class="nav__item">
-                <a href="all-lots.html">Одежда</a>
-            </li>
-            <li class="nav__item">
-                <a href="all-lots.html">Инструменты</a>
-            </li>
-            <li class="nav__item">
-                <a href="all-lots.html">Разное</a>
-            </li>
+            <?php foreach ($categories as $index => $category): ?>
+                <li class="nav__item">
+                    <a href="all-lots.html"><?= $category['name'] ?></a>
+                </li>
+            <?php endforeach; ?>
         </ul>
     </nav>
     <section class="rates container">
@@ -28,7 +15,7 @@
                 <tr class="rates__item">
                     <td class="rates__info">
                         <div class="rates__img">
-                            <img src="../img/rate<?= $bet['id'] ?>.jpg" width="54" height="40" alt="<?= $bet['title'] ?>">
+                            <img src="<?= $bet['image'] ?>" width="54" height="40" alt="<?= $bet['title'] ?>">
                         </div>
                         <h3 class="rates__title"><a href="lot.php?lot_id=<?= $bet['id'] ?>"><?= $bet['title'] ?></a></h3>
                     </td>
