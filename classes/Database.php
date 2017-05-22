@@ -8,26 +8,6 @@
 class Database
 {
     /**
-     * @var string имя хоста
-     */
-    private $host_name;
-
-    /**
-     * @var string имя пользователя
-     */
-    private $user;
-
-    /**
-     * @var string пароль для входа
-     */
-    private $password;
-
-    /**
-     * @var string имя базы данных
-     */
-    private $db;
-
-    /**
      * @var resource ресурс соединения с базой данных
      */
     private $connection;
@@ -44,19 +24,26 @@ class Database
 
     /**
      * Database constructor.
-     * @param array $data массив данных для соединения с базой данных
+     * @param string $host_name имя хоста
+     * @param string $user имя пользователя базы данных
+     * @param string $password пароль пользователя базы данных
+     * @param string $db имя базы данных
      */
-    public function __construct($data)
+    public function __construct($host_name, $user, $password, $db)
     {
-        list($this->host_name, $this->user, $this->password, $this->db) = $data;
+        $this->connect_to_db($host_name, $user, $password, $db);
     }
 
     /**
      * соединение с базой данных
+     * @param string $host_name имя хоста
+     * @param string $user имя пользователя базы данных
+     * @param string $password пароль пользователя базы данных
+     * @param string $db имя базы данных
      */
-    public function connect_to_db()
+     function connect_to_db($host_name, $user, $password, $db)
     {
-        $connection = mysqli_connect($this->host_name, $this->user, $this->password, $this->db);
+        $connection = mysqli_connect($host_name, $user, $password, $db);
         $this->connection = $connection;
         if (!$this->connection) {
             $this->error = "Ошибка соединения с базой данных. " . mysqli_connect_error();
@@ -108,12 +95,14 @@ class Database
      * @param string $query текст запроса
      * @param array $data массив с данным для вставки
      * в подготовленное выражения
+     * @return array
      */
     public function get_data_from_db($query, $data = []) {
         $stmt = $this->db_get_prepare_stmt($query, $data);
         $result = mysqli_stmt_execute($stmt);
 
         $this->last_query_result = $result ? mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC) : [];
+        return $this->last_query_result;
     }
 
     /**
@@ -122,10 +111,12 @@ class Database
      * @param string $query текст запроса
      * @param array $data массив с данным для вставки
      * в подготовленное выражения
+     * @return mixed
      */
     public function insert_data_to_db($query, $data) {
         $result = mysqli_stmt_execute($this->db_get_prepare_stmt($query, $data));
         $this->last_query_result = $result ? mysqli_insert_id($this->connection) : $result;
+        return $this->last_query_result;
     }
 
     /**
@@ -136,6 +127,7 @@ class Database
      * в подготовленное выражения
      * @param array $where_data массив с данным для вставки
      * в подготовленное выражения в качестве условия
+     * @return mixed
      */
     public function update_db_data($table, $data, $where_data) {
         $where_columns = array_keys($where_data);
@@ -165,6 +157,7 @@ class Database
         }
 
         $this->last_query_result =  $result_or_count;
+        return $this->last_query_result;
     }
 
     /**

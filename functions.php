@@ -261,14 +261,9 @@ function register_user(Database $db, $data, $has_avatar = false) {
         $class = '';
         $error = '';
 
-        if ($has_avatar) {
-            $query = "INSERT INTO `users` (`register_date`, `email`, `name`, `password`, `avatar`, `contacts`) VALUES (NOW(), ?, ?, ?, ?, ?);";
-        } else {
-            $query = "INSERT INTO `users` (`register_date`, `email`, `name`, `password`, `contacts`) VALUES (NOW(), ?, ?, ?, ?);";
-        }
+        $query = "INSERT INTO `users` (`register_date`, `email`, `name`, `password`, `avatar`, `contacts`) VALUES (NOW(), ?, ?, ?, ?, ?);";
 
         $db->insert_data_to_db($query, $data);
-        $db->check_error();
     }
 
     return ['class' => $class, 'error' => $error];

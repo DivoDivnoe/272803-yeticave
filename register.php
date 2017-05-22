@@ -6,8 +6,6 @@ if ($user->is_auth_user()) {
     send_header('Location: http://yeticave/index.php');
 }
 
-$db->connect_to_db();
-
 $query_categories = "SELECT * FROM `categories` ORDER BY `id`;";
 
 $db->get_data_from_db($query_categories);
@@ -23,7 +21,7 @@ $register_result = ['class' => '', 'error' => ''];
 
 
 if (isset($_POST['submit']) && !$validate_form) {
-    $data = ['email' => $email_post['value'], 'name' => $name_post['value'], 'password' => password_hash($password_post['value'], PASSWORD_DEFAULT), 'avatar' => $avatar_post['url'], 'contacts' => $contacts_post['value']];
+    $data = ['email' => $email_post['value'], 'name' => $name_post['value'], 'password' => password_hash($password_post['value'], PASSWORD_DEFAULT), 'avatar' => ($avatar_post['url'] ? $avatar_post['url'] : 'img/user.jpg'), 'contacts' => $contacts_post['value']];
     $has_avatar = $avatar_post['url'] ? true : false;
     $register_result = register_user($db, $data, $has_avatar);
 
@@ -44,7 +42,7 @@ if (isset($_POST['submit']) && !$validate_form) {
   <link href="../css/style.css" rel="stylesheet">
 </head>
 <body>
-<?= includeTemplate('templates/header.php'); ?>
+<?= includeTemplate('templates/header.php', $user->get_user_data()); ?>
 <?= includeTemplate('templates/register_main.php', [ 'email' => $email_post,
         'password' => $password_post,
         'name' => $name_post,

@@ -2,12 +2,8 @@
 
 require_once 'init.php';
 
-$db->connect_to_db();
-
 $query_categories = "SELECT * FROM `categories` ORDER BY `id`;";
-
-$db->get_data_from_db($query_categories);
-$categories = $db->get_last_query_result();
+$categories = $db->get_data_from_db($query_categories);
 
 $email_post = check_email('email');
 $pass_post = checkTextInput('password');
@@ -17,7 +13,7 @@ if (isset($_POST['submit']) && !$validate_form) {
     $user->auth_user($db, $_POST['email'], $_POST['password']);
 
     if ($user->is_auth_user()) {
-        send_header('Location: /index.php');
+        header('Location: /index.php');
     }
     $data = ['email' => $email_post, 'pass' => $pass_post, 'form_class' => $validate_form, 'auth' => show_auth_user($user)];
 
@@ -33,7 +29,7 @@ if (isset($_POST['submit']) && !$validate_form) {
     <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
-<?= includeTemplate('templates/header.php'); ?>
+<?= includeTemplate('templates/header.php', $user->get_user_data()); ?>
 <?= includeTemplate('templates/login_main.php', array_merge($data, ['categories' => $categories])); ?>
 <?= includeTemplate('templates/footer.php', ['categories' => $categories]); ?>
 </body>

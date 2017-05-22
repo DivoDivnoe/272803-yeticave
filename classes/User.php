@@ -15,25 +15,37 @@ class User
     /**
      * @var string $email email пользователя
      */
-    protected $email;
+    private $email;
 
     /**
      * @var string $avatar url изображения пользователя
      */
-    protected $avatar;
+    private $avatar;
 
     /**
      * @var bool $isAuth указывает, авторизован ли пользователь
      */
-    protected $isAuth;
+    private $isAuth;
 
     /**
      * User constructor.
-     * @param array $data массив данных о пользователе
+     * @param Database $db объект база данных
      */
-    public function __construct($data)
+    public function __construct(Database $db)
     {
-        list($this->name, $this->email, $this->avatar, $this->isAuth) = $data;
+        if (isset($_SESSION['email'])) {
+            $this->email = $_SESSION['email'];
+            $query = "SELECT `id`, `name`, `register_date`, `avatar`, `contacts` FROM `users` WHERE `email` = ?";
+            $result = $db->get_data_from_db($query, [$this->email])[0];
+            $this->id = $result['id'];
+            $this->name = $result['name'];
+            $this->register_date = $result['register_date'];
+            $this->avatar = $result['avatar'];
+            $this->contacts = $result['contacts'];
+            $this->isAuth = true;
+        } else {
+            $this->isAuth = false;
+        }
     }
 
     /**
@@ -43,9 +55,9 @@ class User
     public function get_user_data()
     {
         if ($this->isAuth) {
-            $data = ['name' => $this->name, 'email' => $this->email, 'avatar' => $this->avatar];
+            $data = ['name' => $this->name, 'email' => $this->email, 'avatar' => $this->avatar, 'isAuth' => true];
         } else {
-            $data = [];
+            $data = ['isAuth' => false];
         }
         return $data;
     }
@@ -62,19 +74,16 @@ class User
     /**
      * производит аутентификацию пользователя
      * @param Database $db объект класса база данных
-     * @param $email введённый пользователем email
-     * @param $pass введённый пользователем пароль
+     * @param string $email введённый пользователем email
+     * @param string $pass введённый пользователем пароль
      */
     public function auth_user(Database $db, $email, $pass)
     {
         $query = "SELECT `email`, `password`, `name`, `avatar`, `contacts` FROM `users` WHERE `email` = ?";
-        $db->get_data_from_db($query, [$email]);
-        $result = $db->get_last_query_result();
+        $result = $db->get_data_from_db($query, [$email]);
 
         if ($result && password_verify($pass, $result[0]['password'])) {
-            $_SESSION['user'] = $result[0]['name'];
             $_SESSION['email'] = $email;
-            $_SESSION['avatar']= $result[0]['avatar'] ? $result[0]['avatar'] : 'user.jpg';
             $this->isAuth = true;
         } else {
             $this->isAuth = false;

@@ -6,10 +6,6 @@ require_once 'functions.php';
 
 session_start();
 
-$db = new Database(['localhost', 'root', '', 'yeticave']);
+$db = new Database('localhost', 'root', '', 'yeticave');
+$user = new User($db);
 
-if (isset($_SESSION['user'])) {
-    $user = new User([$_SESSION['user'], $_SESSION['email'], $_SESSION['avatar'], true]);
-} else {
-    $user = new User([]);
-}

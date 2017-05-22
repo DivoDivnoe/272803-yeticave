@@ -2,16 +2,12 @@
 
 require_once 'init.php';
 
-if (!isset($_SESSION['user'])) {
+if (!$user->is_auth_user()) {
     send_header('HTTP/1.1 403 Forbidden');
 }
 
-$db->connect_to_db();
-
 $query_categories = "SELECT * FROM `categories` ORDER BY `id`;";
-
-$db->get_data_from_db($query_categories);
-$categories = $db->get_last_query_result();
+$categories = $db->get_data_from_db($query_categories);
 
 $query_bets = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.`expire`, `categories`.`name`, `bets`.`sum`, `bets`.`date`, `lots`.`image` FROM `lots` 
                INNER JOIN `categories` ON `categories`.`id` = `lots`.`category_id`
@@ -19,8 +15,7 @@ $query_bets = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.
                INNER JOIN `users` ON `bets`.`user_id` = `users`.`id`
                WHERE `users`.`email` = ?
                ORDER BY `bets`.`date` DESC;";
-$db->get_data_from_db($query_bets, [$_SESSION['email']]);
-$bets = $db->get_last_query_result();
+$bets = $db->get_data_from_db($query_bets, [$_SESSION['email']]);
 ?>
 
 <!DOCTYPE html>
@@ -32,7 +27,7 @@ $bets = $db->get_last_query_result();
     <link href="../css/style.css" rel="stylesheet">
 </head>
 <body>
-<?= includeTemplate('templates/header.php'); ?>
+<?= includeTemplate('templates/header.php', $user->get_user_data()); ?>
 <?= includeTemplate('templates/my_lots_main.php', ['my_bets' => $bets, 'categories' => $categories]); ?>
 <?= includeTemplate('templates/footer.php', ['categories' => $categories]); ?>
 </body>

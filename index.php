@@ -4,12 +4,8 @@ require_once 'init.php';
 
 date_default_timezone_set('Europe/Moscow');
 
-$db->connect_to_db();
-
 $query_categories = "SELECT * FROM `categories` ORDER BY `id`;";
-
-$db->get_data_from_db($query_categories);
-$categories = $db->get_last_query_result();
+$categories = $db->get_data_from_db($query_categories);
 
 /*if (isset($_GET['search']) && !search($connection)['error']) {
     $lots = search($connection)['result'];
@@ -18,8 +14,7 @@ $categories = $db->get_last_query_result();
                INNER JOIN `categories` ON `categories`.`id` = `lots`.`category_id`
                WHERE `lots`.`expire` > NOW()
                ORDER BY `lots`.`register_date` DESC;";
-    $db->get_data_from_db($query_lots);
-    $lots = $db->get_last_query_result();
+    $lots = $db->get_data_from_db($query_lots);
 /*}*/
 
 ?>
@@ -32,14 +27,8 @@ $categories = $db->get_last_query_result();
     <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
-<?php if (isset($_SESSION['user'])): ?>
-<?= includeTemplate('templates/header.php'); ?>
-<?php else: ?>
-<?= includeTemplate('templates/header.php'); ?>
-<?php endif; ?>
+<?= includeTemplate('templates/header.php', $user->get_user_data()); ?>
 <?= includeTemplate('templates/main.php', ['categories' => $categories, 'equip_items' => $lots, 'classes' => ['boards', 'attachment', 'boots', 'clothing', 'tools', 'other']]);?>
 <?= includeTemplate('templates/footer.php', ['categories' => $categories]); ?>
 </body>
 </html>
-
-<?php mysqli_close($connection); ?>
