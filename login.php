@@ -1,25 +1,25 @@
 <?php
 
-require 'functions.php';
+require_once 'init.php';
 
-$connection = connect_to_db('localhost', 'root', '', 'yeticave');
+$db->connect_to_db();
 
 $query_categories = "SELECT * FROM `categories` ORDER BY `id`;";
 
-$categories = get_data_from_db($connection, $query_categories);
-check_query_result($connection, $categories);
+$db->get_data_from_db($query_categories);
+$categories = $db->get_last_query_result();
 
 $email_post = check_email('email');
 $pass_post = checkTextInput('password');
 $validate_form = checkLotForm([$email_post, $pass_post]);
 
 if (isset($_POST['submit']) && !$validate_form) {
-    $auth_result = auth_user($connection, $_POST['email'], $_POST['password']);
+    $user->auth_user($db, $_POST['email'], $_POST['password']);
 
-    if (!$auth_result['error']) {
+    if ($user->is_auth_user()) {
         send_header('Location: /index.php');
     }
-    $data = ['email' => $email_post, 'pass' => $pass_post, 'form_class' => $validate_form, 'auth' => $auth_result];
+    $data = ['email' => $email_post, 'pass' => $pass_post, 'form_class' => $validate_form, 'auth' => show_auth_user($user)];
 
 } else {
     $data = ['email' => $email_post, 'pass' => $pass_post, 'form_class' => $validate_form];

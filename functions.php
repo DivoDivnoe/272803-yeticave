@@ -115,17 +115,12 @@ function check_email($email) {
     return ['class' => $class, 'error' => $error, 'value' => $value];
 }
 
-function check_email_in_db($connection, $email) {
-    $query = "SELECT `email` FROM `users`";
-    $email_list = get_data_from_db($connection, $query);
+function check_email_in_db(Database $db, $email) {
+    $query = "SELECT `email` FROM `users` WHERE email = ?";
+    $db->get_data_from_db($query, [$email]);
+    $email_list = $db->get_last_query_result();
 
-    foreach ($email_list as $email_field) {
-        if ($email === $email_field['email']) {
-            return true;
-        }
-    }
-
-    return false;
+    return $email_list ? true : false;
 }
 
 function checkSelectInput($name, $options) {
@@ -233,7 +228,6 @@ function check_date($date) {
     }
 
     return ['class' => $class, 'error' => $error, 'value' => $value];
-
 }
 
 function checkLotForm($checkedFields) {
@@ -246,18 +240,11 @@ function checkLotForm($checkedFields) {
     return '';
 }
 
-function auth_user($connection, $email, $pass) {
+function show_auth_user(User $user) {
     $class = 'form__item--invalid';
     $error = 'Комбинация пользователь - пароль неверна';
-
-    $query = "SELECT `email`, `password`, `name`, `avatar` FROM `users` WHERE `email` = ?";
-    $result = get_data_from_db($connection, $query, [$email]);
-
-    if ($result && password_verify($pass, $result[0]['password'])) {
-        session_start();
-        $_SESSION['user'] = $result[0]['name'];
-        $_SESSION['email'] = $email;
-        $_SESSION['avatar'] = $result[0]['avatar'] ? $result[0]['avatar'] : 'user.jpg';
+    
+    if ($user->is_auth_user()) {
         $class = '';
         $error = '';
     }
@@ -265,11 +252,11 @@ function auth_user($connection, $email, $pass) {
     return ['class' => $class, 'error' => $error];
 }
 
-function register_user($link, $data, $has_avatar = false) {
+function register_user(Database $db, $data, $has_avatar = false) {
     $class = 'form__item--invalid';
     $error = 'Пользователь с таким email уже зарегистрирован';
 
-    $email_in_db = check_email_in_db($link, $data['email']);
+    $email_in_db = check_email_in_db($db, $data['email']);
     if (!$email_in_db) {
         $class = '';
         $error = '';
@@ -280,8 +267,8 @@ function register_user($link, $data, $has_avatar = false) {
             $query = "INSERT INTO `users` (`register_date`, `email`, `name`, `password`, `contacts`) VALUES (NOW(), ?, ?, ?, ?);";
         }
 
-        $result = insert_data_to_db($link, $query, $data);
-        check_query_result($link, $result);
+        $db->insert_data_to_db($query, $data);
+        $db->check_error();
     }
 
     return ['class' => $class, 'error' => $error];
@@ -295,115 +282,6 @@ function addBet($bet, $lot_id) {
     setcookie("my_bets[{$lot_id}]", $bet_data, $expire, '/');
 }
 
-
-/**
- * Создает подготовленное выражение на основе готового SQL запроса и переданных данных
- *
- * @param $link mysqli Ресурс соединения
- * @param $sql string SQL запрос с плейсхолдерами вместо значений
- * @param array $data Данные для вставки на место плейсхолдеров
- *
- * @return mysqli_stmt Подготовленное выражение
- */
-function db_get_prepare_stmt($link, $sql, $data = []) {
-    $stmt = mysqli_prepare($link, $sql);
-
-    if(!$stmt) {
-        exit("Ошибка подготовки запроса: " . mysqli_error($link));
-    }
-
-    if ($data) {
-        $types = '';
-        $stmt_data = [];
-
-        foreach ($data as $value) {
-            $type = null;
-
-            if (is_int($value)) {
-                $type = 'i';
-            }
-            else if (is_string($value)) {
-                $type = 's';
-            }
-            else if (is_double($value)) {
-                $type = 'd';
-            }
-
-            if ($type) {
-                $types .= $type;
-                $stmt_data[] = $value;
-            }
-        }
-
-        $values = array_merge([$stmt, $types], $stmt_data);
-        $func = 'mysqli_stmt_bind_param';
-        $func(...$values);
-    }
-
-    return $stmt;
-}
-
-function get_data_from_db($link, $query, $data = []) {
-    $stmt = db_get_prepare_stmt($link, $query, $data);
-    $result = mysqli_stmt_execute($stmt);
-
-    return ($result ? mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC) : []);
-}
-
-function insert_data_to_db($link, $query, $data) {
-    $result = mysqli_stmt_execute(db_get_prepare_stmt($link, $query, $data));
-    return ($result ? mysqli_insert_id($link) : $result);
-}
-
-function update_db_data($link, $table, $data, $where_data) {
-    $where_columns = array_keys($where_data);
-    $result_or_count = 0;
-
-    foreach ($data as $index => $field) {
-        $query = "UPDATE $table SET";
-
-        foreach ($field as $column => $value) {
-            $query .= " $column = ?,";
-        }
-
-        $query = rtrim($query, ',');
-        $where_column = $where_columns[$index];
-        $query .= " WHERE $where_column = ?;\n";
-        $merged_data = array_merge($field, array_slice($where_data, $index, 1));
-        $stmt = db_get_prepare_stmt($link, $query, $merged_data);
-        $result = mysqli_stmt_execute($stmt);
-        mysqli_stmt_close($stmt);
-
-        if (!$result) {
-            $result_or_count = false;
-            break;
-        } else {
-            $result_or_count++;
-        }
-    }
-
-    return $result_or_count;
-}
-
-function connect_to_db($host, $user, $password, $db) {
-    $connection = mysqli_connect($host, $user, $password, $db);
-
-    if (mysqli_connect_errno()) {
-        exit("Ошибка соединения с базой данных. " . mysqli_connect_error());
-    }
-    
-    $result = mysqli_query($connection, 'SET NAMES utf8');
-    check_query_result($connection, $result);
-
-    return $connection;
-}
-
-function check_query_result($connection, $result) {
-    if (!$result) {
-        exit('Ошибка запроса к базе данных. ' . mysqli_error($connection));
-    }
-}
-
 function generate_unique_name($name)
 {
     $extension = get_extension($name);
@@ -414,7 +292,7 @@ function get_extension($filename) {
     return array_pop(explode('.', $filename));
 }
 
-function search($connection) {
+/*function search($connection) {
     $search_get = checkTextInput('search');
     $search = $_GET['search'];
     $result = '';
@@ -429,4 +307,4 @@ function search($connection) {
     }
 
     return ['error' => $search_get['error'], 'result' => $result];
-}
+}*/

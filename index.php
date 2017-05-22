@@ -1,42 +1,26 @@
 <?php
 
-require_once 'functions.php';
+require_once 'init.php';
 
-// устанавливаем часовой пояс в Московское время
 date_default_timezone_set('Europe/Moscow');
 
-// записать в эту переменную оставшееся время в этом формате (ЧЧ:ММ)
-$lot_time_remaining = "00:00";
-
-// временная метка для полночи следующего дня
-$tomorrow = strtotime('tomorrow midnight');
-
-// временная метка для настоящего времени
-$now = time();
-
-// далее нужно вычислить оставшееся время до начала следующих суток и записать его в переменную $lot_time_remaining
-
-$lot_time_remaining = gmdate('H:i', $tomorrow - $now);
-
-$connection = connect_to_db('localhost', 'root', '', 'yeticave');
+$db->connect_to_db();
 
 $query_categories = "SELECT * FROM `categories` ORDER BY `id`;";
 
-$categories = get_data_from_db($connection, $query_categories);
-check_query_result($connection, $categories);
+$db->get_data_from_db($query_categories);
+$categories = $db->get_last_query_result();
 
-if (isset($_GET['search']) && !search($connection)['error']) {
+/*if (isset($_GET['search']) && !search($connection)['error']) {
     $lots = search($connection)['result'];
-} else {
+} else {*/
     $query_lots = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.`description`, `lots`.`image`, `lots`.`start_price`, `lots`.`expire`, `categories`.`name` FROM `lots` 
                INNER JOIN `categories` ON `categories`.`id` = `lots`.`category_id`
                WHERE `lots`.`expire` > NOW()
                ORDER BY `lots`.`register_date` DESC;";
-    $lots = get_data_from_db($connection, $query_lots);
-    check_query_result($connection, $lots);
-}
-
-session_start();
+    $db->get_data_from_db($query_lots);
+    $lots = $db->get_last_query_result();
+/*}*/
 
 ?>
 <!DOCTYPE html>

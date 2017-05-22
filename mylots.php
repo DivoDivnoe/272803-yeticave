@@ -1,19 +1,17 @@
 <?php
 
-session_start();
-
-require 'functions.php';
+require_once 'init.php';
 
 if (!isset($_SESSION['user'])) {
     send_header('HTTP/1.1 403 Forbidden');
 }
 
-$connection = connect_to_db('localhost', 'root', '', 'yeticave');
+$db->connect_to_db();
 
-$query = "SELECT `name` FROM `categories` ORDER BY `id`;";
+$query_categories = "SELECT * FROM `categories` ORDER BY `id`;";
 
-$categories = get_data_from_db($connection, $query);
-check_query_result($connection, $categories);
+$db->get_data_from_db($query_categories);
+$categories = $db->get_last_query_result();
 
 $query_bets = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.`expire`, `categories`.`name`, `bets`.`sum`, `bets`.`date`, `lots`.`image` FROM `lots` 
                INNER JOIN `categories` ON `categories`.`id` = `lots`.`category_id`
@@ -21,7 +19,8 @@ $query_bets = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.
                INNER JOIN `users` ON `bets`.`user_id` = `users`.`id`
                WHERE `users`.`email` = ?
                ORDER BY `bets`.`date` DESC;";
-$bets = get_data_from_db($connection, $query_bets, [$_SESSION['email']]);
+$db->get_data_from_db($query_bets, [$_SESSION['email']]);
+$bets = $db->get_last_query_result();
 ?>
 
 <!DOCTYPE html>

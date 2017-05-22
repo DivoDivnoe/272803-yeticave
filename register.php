@@ -1,18 +1,17 @@
 <?php
 
-require_once 'functions.php';
+require_once 'init.php';
 
-session_start();
-
-if (isset($_SESSION['user'])) {
+if ($user->is_auth_user()) {
     send_header('Location: http://yeticave/index.php');
 }
 
-$connection = connect_to_db('localhost', 'root', '', 'yeticave');
+$db->connect_to_db();
 
-$query = "SELECT `name` FROM `categories` ORDER BY `id`;";
-$categories = get_data_from_db($connection, $query);
-check_query_result($connection, $categories);
+$query_categories = "SELECT * FROM `categories` ORDER BY `id`;";
+
+$db->get_data_from_db($query_categories);
+$categories = $db->get_last_query_result();
 
 $email_post = check_email('email');
 $password_post = checkTextInput('password');
@@ -26,7 +25,7 @@ $register_result = ['class' => '', 'error' => ''];
 if (isset($_POST['submit']) && !$validate_form) {
     $data = ['email' => $email_post['value'], 'name' => $name_post['value'], 'password' => password_hash($password_post['value'], PASSWORD_DEFAULT), 'avatar' => $avatar_post['url'], 'contacts' => $contacts_post['value']];
     $has_avatar = $avatar_post['url'] ? true : false;
-    $register_result = register_user($connection, $data, $has_avatar);
+    $register_result = register_user($db, $data, $has_avatar);
 
     if (!$register_result['error']) {
         send_header('Location: http://yeticave/login.php');
