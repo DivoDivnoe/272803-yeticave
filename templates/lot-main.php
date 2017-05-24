@@ -19,7 +19,7 @@
                 <p class="lot-item__description"><?= htmlspecialchars($equip_item['description']) ?></p>
             </div>
             <div class="lot-item__right">
-                <?php if (isset($_SESSION['user']) && !$my_bet && !$is_my_lot): ?>
+                <?php if ($isAuth && !$my_bet && !$is_my_lot): ?>
                     <div class="lot-item__state">
                         <div class="lot-item__timer timer">
                             <?= show_left_time(htmlspecialchars($equip_item['expire'])); ?>

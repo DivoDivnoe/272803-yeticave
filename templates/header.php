@@ -11,12 +11,12 @@
         <a class="main-header__add-lot button" href="add.php">Добавить лот</a>
 
         <nav class="user-menu">
-            <?php if (isset($_SESSION['user'])): ?>
+            <?php if ($isAuth): ?>
             <div class="user-menu__image">
-                <img src="img/<?= $_SESSION['avatar'] ?>" width="40" height="40" alt="Пользователь">
+                <img src="<?= $avatar ?>" width="40" height="40" alt="Пользователь">
             </div>
             <div class="user-menu__logged">
-                <p><?= $_SESSION['user'] ?></p>
+                <p><?= $name ?></p>
                 <a href="logout.php">Выйти</a>
             </div>
             <?php else: ?>

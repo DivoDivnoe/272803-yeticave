@@ -1,25 +1,21 @@
 <?php
 
-require 'functions.php';
-
-$connection = connect_to_db('localhost', 'root', '', 'yeticave');
+require_once 'init.php';
 
 $query_categories = "SELECT * FROM `categories` ORDER BY `id`;";
-
-$categories = get_data_from_db($connection, $query_categories);
-check_query_result($connection, $categories);
+$categories = $db->get_data_from_db($query_categories);
 
 $email_post = check_email('email');
 $pass_post = checkTextInput('password');
 $validate_form = checkLotForm([$email_post, $pass_post]);
 
 if (isset($_POST['submit']) && !$validate_form) {
-    $auth_result = auth_user($connection, $_POST['email'], $_POST['password']);
+    $user->auth_user($db, $_POST['email'], $_POST['password']);
 
-    if (!$auth_result['error']) {
-        send_header('Location: /index.php');
+    if ($user->is_auth_user()) {
+        header('Location: /index.php');
     }
-    $data = ['email' => $email_post, 'pass' => $pass_post, 'form_class' => $validate_form, 'auth' => $auth_result];
+    $data = ['email' => $email_post, 'pass' => $pass_post, 'form_class' => $validate_form, 'auth' => show_auth_user($user)];
 
 } else {
     $data = ['email' => $email_post, 'pass' => $pass_post, 'form_class' => $validate_form];
@@ -33,7 +29,7 @@ if (isset($_POST['submit']) && !$validate_form) {
     <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
-<?= includeTemplate('templates/header.php'); ?>
+<?= includeTemplate('templates/header.php', $user->get_user_data()); ?>
 <?= includeTemplate('templates/login_main.php', array_merge($data, ['categories' => $categories])); ?>
 <?= includeTemplate('templates/footer.php', ['categories' => $categories]); ?>
 </body>

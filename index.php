@@ -1,42 +1,21 @@
 <?php
 
-require_once 'functions.php';
+require_once 'init.php';
 
-// устанавливаем часовой пояс в Московское время
 date_default_timezone_set('Europe/Moscow');
 
-// записать в эту переменную оставшееся время в этом формате (ЧЧ:ММ)
-$lot_time_remaining = "00:00";
-
-// временная метка для полночи следующего дня
-$tomorrow = strtotime('tomorrow midnight');
-
-// временная метка для настоящего времени
-$now = time();
-
-// далее нужно вычислить оставшееся время до начала следующих суток и записать его в переменную $lot_time_remaining
-
-$lot_time_remaining = gmdate('H:i', $tomorrow - $now);
-
-$connection = connect_to_db('localhost', 'root', '', 'yeticave');
-
 $query_categories = "SELECT * FROM `categories` ORDER BY `id`;";
+$categories = $db->get_data_from_db($query_categories);
 
-$categories = get_data_from_db($connection, $query_categories);
-check_query_result($connection, $categories);
-
-if (isset($_GET['search']) && !search($connection)['error']) {
+/*if (isset($_GET['search']) && !search($connection)['error']) {
     $lots = search($connection)['result'];
-} else {
+} else {*/
     $query_lots = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.`description`, `lots`.`image`, `lots`.`start_price`, `lots`.`expire`, `categories`.`name` FROM `lots` 
                INNER JOIN `categories` ON `categories`.`id` = `lots`.`category_id`
                WHERE `lots`.`expire` > NOW()
                ORDER BY `lots`.`register_date` DESC;";
-    $lots = get_data_from_db($connection, $query_lots);
-    check_query_result($connection, $lots);
-}
-
-session_start();
+    $lots = $db->get_data_from_db($query_lots);
+/*}*/
 
 ?>
 <!DOCTYPE html>
@@ -48,14 +27,8 @@ session_start();
     <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
-<?php if (isset($_SESSION['user'])): ?>
-<?= includeTemplate('templates/header.php'); ?>
-<?php else: ?>
-<?= includeTemplate('templates/header.php'); ?>
-<?php endif; ?>
+<?= includeTemplate('templates/header.php', $user->get_user_data()); ?>
 <?= includeTemplate('templates/main.php', ['categories' => $categories, 'equip_items' => $lots, 'classes' => ['boards', 'attachment', 'boots', 'clothing', 'tools', 'other']]);?>
 <?= includeTemplate('templates/footer.php', ['categories' => $categories]); ?>
 </body>
 </html>
-
-<?php mysqli_close($connection); ?>
