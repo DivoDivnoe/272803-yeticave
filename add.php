@@ -9,10 +9,7 @@ if (!$user->is_auth_user()) {
 
 date_default_timezone_set('Europe/Moscow');
 
-$query_categories = "SELECT * FROM `categories` ORDER BY `id`;";
-
-$categories = $db->get_data_from_db($query_categories);
-
+$categories = $query_result->get_all_categories();
 $options = ['Выберите категорию'];
 
 foreach($categories as $category) {
@@ -29,19 +26,11 @@ $lot_date_post = check_date('lot-date');
 $validate_form = checkLotForm([$title_post, $category_post, $message_post, $user_file_post, $lot_rate_post, $lot_step_post, $lot_date_post]);
 
 if (isset($_POST['submit']) && !$validate_form) {
-    $query_lot_category = "SELECT `id` FROM `categories` WHERE `name` = ?";
-    $lot_category = $db->get_data_from_db($query_lot_category, [$category_post['value']]);
-
-    $query_author_id = "SELECT `id` FROM `users` WHERE `email` = ?";
-    $author_id = $this->get_data_from_db($query_author_id, [$_SESSION['email']]);
-
-    $data = [$lot_category[0]['id'], $author_id[0]['id'], $_POST['lot-name'], $_POST['message'], $user_file_post['url'], $_POST['lot-rate'], date('Y-m-d H:i:s' ,strtotime($_POST['lot-date'])), $_POST['lot-step']];
-
-    $query = "INSERT INTO `lots` (`category_id`, `author_id`, `register_date`, `title`, `description`, `image`, `start_price`, `expire`, `step`) 
-              VALUES (?, ?, NOW(), ?, ?, ?, ?, ?, ?);";
-    $result = $db->insert_data_to_db($query, $data);
-
-    send_header("Location: http://yeticave/lot.php?lot_id=$result");
+    $lot_category = $query_result->get_categoryId_by_name($category_post['value']);
+    $author_id = $query_result->get_user_by_email($_SESSION['email'])[0]['id'];
+    $new_lot_id = $query_result->add_new_lot($lot_category, $author_id, $_POST['lot-name'], $_POST['message'], $user_file_post['url'], $_POST['lot-rate'], date('Y-m-d H:i:s' ,strtotime($_POST['lot-date'])), $_POST['lot-step']);
+    
+    send_header("Location: http://yeticave/lot.php?lot_id=$new_lot_id");
 }
 ?>
 <!DOCTYPE html>

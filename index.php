@@ -1,21 +1,10 @@
 <?php
-
 require_once 'init.php';
 
 date_default_timezone_set('Europe/Moscow');
 
-$query_categories = "SELECT * FROM `categories` ORDER BY `id`;";
-$categories = $db->get_data_from_db($query_categories);
-
-/*if (isset($_GET['search']) && !search($connection)['error']) {
-    $lots = search($connection)['result'];
-} else {*/
-    $query_lots = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.`description`, `lots`.`image`, `lots`.`start_price`, `lots`.`expire`, `categories`.`name` FROM `lots` 
-               INNER JOIN `categories` ON `categories`.`id` = `lots`.`category_id`
-               WHERE `lots`.`expire` > NOW()
-               ORDER BY `lots`.`register_date` DESC;";
-    $lots = $db->get_data_from_db($query_lots);
-/*}*/
+$categories = $query_result->get_all_categories();
+$lots = $query_result->get_all_opened_lots();
 
 ?>
 <!DOCTYPE html>

@@ -6,10 +6,7 @@ if ($user->is_auth_user()) {
     send_header('Location: http://yeticave/index.php');
 }
 
-$query_categories = "SELECT * FROM `categories` ORDER BY `id`;";
-
-$db->get_data_from_db($query_categories);
-$categories = $db->get_last_query_result();
+$categories = $query_result->get_all_categories();
 
 $email_post = check_email('email');
 $password_post = checkTextInput('password');

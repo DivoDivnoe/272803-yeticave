@@ -10,33 +10,36 @@ class User
     /**
      * @var string $name Имя пользователя
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string $email email пользователя
      */
-    private $email;
+    protected $email;
 
     /**
      * @var string $avatar url изображения пользователя
      */
-    private $avatar;
+    protected $avatar;
 
     /**
      * @var bool $isAuth указывает, авторизован ли пользователь
      */
-    private $isAuth;
+    protected $isAuth;
+    /**
+     * @var string $register_date дата регистрации пользователя
+     */
+    protected $register_date;
 
     /**
      * User constructor.
-     * @param Database $db объект база данных
+     * @param Queries_repository $query_result объект библиотеки запросов
      */
-    public function __construct(Database $db)
+    public function __construct(Queries_repository $query_result)
     {
         if (isset($_SESSION['email'])) {
             $this->email = $_SESSION['email'];
-            $query = "SELECT `id`, `name`, `register_date`, `avatar`, `contacts` FROM `users` WHERE `email` = ?";
-            $result = $db->get_data_from_db($query, [$this->email])[0];
+            $result = $query_result->get_user_by_email($this->email)[0];
             $this->id = $result['id'];
             $this->name = $result['name'];
             $this->register_date = $result['register_date'];
@@ -73,16 +76,16 @@ class User
 
     /**
      * производит аутентификацию пользователя
-     * @param Database $db объект класса база данных
+     * @param Queries_repository $query_result
      * @param string $email введённый пользователем email
      * @param string $pass введённый пользователем пароль
-     */
-    public function auth_user(Database $db, $email, $pass)
-    {
-        $query = "SELECT `email`, `password`, `name`, `avatar`, `contacts` FROM `users` WHERE `email` = ?";
-        $result = $db->get_data_from_db($query, [$email]);
 
-        if ($result && password_verify($pass, $result[0]['password'])) {
+     */
+    public function auth_user(Queries_repository $query_result, $email, $pass)
+    {
+        $result = $query_result->get_password_by_email($email)[0]['password'];
+
+        if ($result && password_verify($pass, $result)) {
             $_SESSION['email'] = $email;
             $this->isAuth = true;
         } else {

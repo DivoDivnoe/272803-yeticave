@@ -2,15 +2,14 @@
 
 require_once 'init.php';
 
-$query_categories = "SELECT * FROM `categories` ORDER BY `id`;";
-$categories = $db->get_data_from_db($query_categories);
+$categories = $query_result->get_all_categories();
 
 $email_post = check_email('email');
 $pass_post = checkTextInput('password');
 $validate_form = checkLotForm([$email_post, $pass_post]);
 
 if (isset($_POST['submit']) && !$validate_form) {
-    $user->auth_user($db, $_POST['email'], $_POST['password']);
+    $user->auth_user($query_result, $_POST['email'], $_POST['password']);
 
     if ($user->is_auth_user()) {
         header('Location: /index.php');
