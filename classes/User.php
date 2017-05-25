@@ -8,35 +8,42 @@
 class User
 {
     /**
+     * @var integer $id идентификатор пользователя
+     */
+    protected $id;
+    /**
      * @var string $name Имя пользователя
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string $email email пользователя
      */
-    private $email;
+    protected $email;
 
     /**
      * @var string $avatar url изображения пользователя
      */
-    private $avatar;
+    protected $avatar;
 
     /**
      * @var bool $isAuth указывает, авторизован ли пользователь
      */
-    private $isAuth;
+    protected $isAuth;
+    /**
+     * @var string $register_date дата регистрации пользователя
+     */
+    protected $register_date;
 
     /**
      * User constructor.
-     * @param Database $db объект база данных
+     * @param Users_repository $users_queries объект библиотеки запросов связанных с пользователем
      */
-    public function __construct(Database $db)
+    public function __construct(Users_repository $users_queries)
     {
         if (isset($_SESSION['email'])) {
             $this->email = $_SESSION['email'];
-            $query = "SELECT `id`, `name`, `register_date`, `avatar`, `contacts` FROM `users` WHERE `email` = ?";
-            $result = $db->get_data_from_db($query, [$this->email])[0];
+            $result = $users_queries->get_user_by_email($this->email);
             $this->id = $result['id'];
             $this->name = $result['name'];
             $this->register_date = $result['register_date'];
@@ -55,7 +62,7 @@ class User
     public function get_user_data()
     {
         if ($this->isAuth) {
-            $data = ['name' => $this->name, 'email' => $this->email, 'avatar' => $this->avatar, 'isAuth' => true];
+            $data = ['id' => $this->id, 'name' => $this->name, 'email' => $this->email, 'avatar' => $this->avatar, 'isAuth' => true];
         } else {
             $data = ['isAuth' => false];
         }
@@ -73,16 +80,16 @@ class User
 
     /**
      * производит аутентификацию пользователя
-     * @param Database $db объект класса база данных
+     * @param Users_repository $users_queries репозиторий запросов, связанных с пользователями
      * @param string $email введённый пользователем email
      * @param string $pass введённый пользователем пароль
-     */
-    public function auth_user(Database $db, $email, $pass)
-    {
-        $query = "SELECT `email`, `password`, `name`, `avatar`, `contacts` FROM `users` WHERE `email` = ?";
-        $result = $db->get_data_from_db($query, [$email]);
 
-        if ($result && password_verify($pass, $result[0]['password'])) {
+     */
+    public function auth_user(Users_repository $users_queries, $email, $pass)
+    {
+        $result = $users_queries->get_password_by_email($email);
+
+        if ($result && password_verify($pass, $result)) {
             $_SESSION['email'] = $email;
             $this->isAuth = true;
         } else {

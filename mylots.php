@@ -6,16 +6,8 @@ if (!$user->is_auth_user()) {
     send_header('HTTP/1.1 403 Forbidden');
 }
 
-$query_categories = "SELECT * FROM `categories` ORDER BY `id`;";
-$categories = $db->get_data_from_db($query_categories);
-
-$query_bets = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.`expire`, `categories`.`name`, `bets`.`sum`, `bets`.`date`, `lots`.`image` FROM `lots` 
-               INNER JOIN `categories` ON `categories`.`id` = `lots`.`category_id`
-               INNER JOIN `bets` ON `bets`.`lot_id` = `lots`.`id`
-               INNER JOIN `users` ON `bets`.`user_id` = `users`.`id`
-               WHERE `users`.`email` = ?
-               ORDER BY `bets`.`date` DESC;";
-$bets = $db->get_data_from_db($query_bets, [$_SESSION['email']]);
+$categories = $categories_queries->get_all_categories();
+$bets = $bets_queries->get_bets_by_user_email($_SESSION['email']);
 ?>
 
 <!DOCTYPE html>

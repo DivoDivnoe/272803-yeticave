@@ -10,17 +10,17 @@ class Database
     /**
      * @var resource ресурс соединения с базой данных
      */
-    private $connection;
+    protected $connection;
 
     /**
      * @var string текст последней ошибки
      */
-    private $error = '';
+    protected $error = '';
 
     /**
      * @var mixed результат последнего запроса
      */
-    private $last_query_result;
+    protected $last_query_result;
 
     /**
      * Database constructor.
