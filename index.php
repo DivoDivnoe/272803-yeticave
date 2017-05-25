@@ -3,8 +3,8 @@ require_once 'init.php';
 
 date_default_timezone_set('Europe/Moscow');
 
-$categories = $query_result->get_all_categories();
-$lots = $query_result->get_all_opened_lots();
+$categories = $categories_queries->get_all_categories();
+$lots = $lots_queries->get_all_opened_lots();
 
 ?>
 <!DOCTYPE html>

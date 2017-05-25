@@ -252,18 +252,16 @@ function show_auth_user(User $user) {
     return ['class' => $class, 'error' => $error];
 }
 
-function register_user(Database $db, $data, $has_avatar = false) {
+function register_user(Database $db, Users_repository $users_queries, $email, $name, $password, $avatar, $contacts) {
     $class = 'form__item--invalid';
     $error = 'Пользователь с таким email уже зарегистрирован';
 
-    $email_in_db = check_email_in_db($db, $data['email']);
+    $email_in_db = check_email_in_db($db, $email);
     if (!$email_in_db) {
         $class = '';
         $error = '';
 
-        $query = "INSERT INTO `users` (`register_date`, `email`, `name`, `password`, `avatar`, `contacts`) VALUES (NOW(), ?, ?, ?, ?, ?);";
-
-        $db->insert_data_to_db($query, $data);
+        $users_queries->add_new_user($email, $name, $password, $avatar, $contacts);
     }
 
     return ['class' => $class, 'error' => $error];

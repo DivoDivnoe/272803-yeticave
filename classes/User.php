@@ -8,6 +8,10 @@
 class User
 {
     /**
+     * @var integer $id идентификатор пользователя
+     */
+    protected $id;
+    /**
      * @var string $name Имя пользователя
      */
     protected $name;
@@ -33,13 +37,13 @@ class User
 
     /**
      * User constructor.
-     * @param Queries_repository $query_result объект библиотеки запросов
+     * @param Users_repository $users_queries объект библиотеки запросов связанных с пользователем
      */
-    public function __construct(Queries_repository $query_result)
+    public function __construct(Users_repository $users_queries)
     {
         if (isset($_SESSION['email'])) {
             $this->email = $_SESSION['email'];
-            $result = $query_result->get_user_by_email($this->email)[0];
+            $result = $users_queries->get_user_by_email($this->email);
             $this->id = $result['id'];
             $this->name = $result['name'];
             $this->register_date = $result['register_date'];
@@ -58,7 +62,7 @@ class User
     public function get_user_data()
     {
         if ($this->isAuth) {
-            $data = ['name' => $this->name, 'email' => $this->email, 'avatar' => $this->avatar, 'isAuth' => true];
+            $data = ['id' => $this->id, 'name' => $this->name, 'email' => $this->email, 'avatar' => $this->avatar, 'isAuth' => true];
         } else {
             $data = ['isAuth' => false];
         }
@@ -76,14 +80,14 @@ class User
 
     /**
      * производит аутентификацию пользователя
-     * @param Queries_repository $query_result
+     * @param Users_repository $users_queries репозиторий запросов, связанных с пользователями
      * @param string $email введённый пользователем email
      * @param string $pass введённый пользователем пароль
 
      */
-    public function auth_user(Queries_repository $query_result, $email, $pass)
+    public function auth_user(Users_repository $users_queries, $email, $pass)
     {
-        $result = $query_result->get_password_by_email($email)[0]['password'];
+        $result = $users_queries->get_password_by_email($email);
 
         if ($result && password_verify($pass, $result)) {
             $_SESSION['email'] = $email;

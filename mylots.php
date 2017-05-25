@@ -6,8 +6,8 @@ if (!$user->is_auth_user()) {
     send_header('HTTP/1.1 403 Forbidden');
 }
 
-$categories = $query_result->get_all_categories();
-$bets = $query_result->get_lots_by_user_email($_SESSION['email']);
+$categories = $categories_queries->get_all_categories();
+$bets = $bets_queries->get_bets_by_user_email($_SESSION['email']);
 ?>
 
 <!DOCTYPE html>
