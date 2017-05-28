@@ -68,7 +68,7 @@ function show_left_time($time) {
     $twenty_four_hours = 24 * 60 * 60;
 
     if ($ts_left < $twenty_four_hours) {
-        $left_time = date('H:i', $ts_left);
+        $left_time = gmdate('H:i', $ts_left);
     } else {
         $left_time = formatTime($ts_left);
     }
@@ -275,8 +275,7 @@ function addBet($bet, $lot_id) {
     setcookie("my_bets[{$lot_id}]", $bet_data, $expire, '/');
 }
 
-function generate_unique_name($name)
-{
+function generate_unique_name($name) {
     $extension = get_extension($name);
     return md5($name) . time() . '.' . $extension;
 }
@@ -285,19 +284,46 @@ function get_extension($filename) {
     return array_pop(explode('.', $filename));
 }
 
-/*function search($connection) {
-    $search_get = checkTextInput('search');
-    $search = $_GET['search'];
-    $result = '';
+function search(Lots_repository $lots_queries, $lots_per_page) {
+    $query = htmlspecialchars(trim($_GET['search']));
 
-    if (!$search_get['error']) {
-        $query = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.`description`, `lots`.`image`, `lots`.`start_price`, `lots`.`expire`, `categories`.`name` FROM `lots` 
-               INNER JOIN `categories` ON `categories`.`id` = `lots`.`category_id`
-               WHERE `lots`.`expire` > NOW() AND (`lots`.`title` LIKE ? OR `lots`.`description` LIKE ?)
-               ORDER BY `lots`.`register_date` DESC;";
+    $num_of_lots = $lots_queries->get_num_of_lots_by_key($query);
+    $num_of_pages = ceil($num_of_lots / $lots_per_page);
 
-        $result = get_data_from_db($connection, $query, ["%$search%", "%$search%"]);
+    $result = [];
+
+    if (!empty($_GET['search'])) {
+        for ($i = 0; $i < $num_of_lots; $i += $lots_per_page) {
+            $result[] = $lots_queries->get_lots_by_key($query, $i, $lots_per_page);
+        }
+    }
+    
+    return ['result' => $result, 'num_of_lots' => $num_of_lots, 'num_of_pages' => $num_of_pages, 'query' => $query];
+}
+
+function format_bets_string($num_of_bets) {
+    $bet_string = ['ставок', 'ставка', 'ставки'];
+
+    $num_of_bets = (string) $num_of_bets;
+    $num_of_bets_length = strlen($num_of_bets);
+
+    if ($num_of_bets_length === 1) {
+        $last_char = $num_of_bets;
+        $before_last_char = 0;
+    } else {
+        $last_char = substr($num_of_bets, -1);
+        $before_last_char = substr($num_of_bets, -2, 1);
     }
 
-    return ['error' => $search_get['error'], 'result' => $result];
-}*/
+    $last_chars = ['1', '2', '3', '4'];
+
+    if (!in_array($last_char, $last_chars) || $before_last_char === '1') {
+        $result_str = $num_of_bets .  ' ' . $bet_string[0];
+    } else if ($last_char === '1') {
+        $result_str = $num_of_bets .  ' ' . $bet_string[1];
+    } else {
+        $result_str = $num_of_bets .  ' ' . $bet_string[2];
+    }
+
+    return $result_str;
+}

@@ -42,7 +42,7 @@ if (isset($_POST['submit']) && !$validate_form) {
   <link href="../css/style.css" rel="stylesheet">
 </head>
 <body>
-<?= includeTemplate('templates/header.php', $user->get_user_data()); ?>
+<?= includeTemplate('templates/header.php', array_merge($user->get_user_data())); ?>
 <?= includeTemplate('templates/register_main.php', [ 'email' => $email_post,
         'password' => $password_post,
         'name' => $name_post,

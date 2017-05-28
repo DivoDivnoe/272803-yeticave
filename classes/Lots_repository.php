@@ -71,4 +71,41 @@ class Lots_repository extends Queries_repository
 
         return $result;
     }
+
+    /**
+     * осуществляет выборку лотов из базы данных по ключевым словам
+     * @param string $key ключ поиска
+     * @return integer количество лотов, удовлетворяющих поисковому запросу
+     */
+
+    public function get_num_of_lots_by_key($key) {
+        $query_lots = "SELECT COUNT(*) as `num_of_lots` FROM `lots` 
+                       WHERE (`title` LIKE ? OR `description` LIKE ?) AND `expire` > NOW();";
+        $lots = $this->db->get_data_from_db($query_lots, ["%$key%", "%$key%"])[0]['num_of_lots'];
+
+        return $lots;
+    }
+
+    public function get_lots_by_key($key, $offset, $num) {
+        $query_lots = "SELECT `lots`.`title`, `lots`.`description`, `lots`.`image`, `lots`.`id`, `lots`.`expire`, COUNT(`bets`.`id`) as `num_of_bets`, `lots`.`start_price` FROM `lots` 
+                       LEFT JOIN `bets` ON `bets`.`lot_id` = `lots`.`id`
+                       WHERE (`lots`.`title` LIKE ? OR `lots`.`description` LIKE ?) AND `lots`.`expire` > NOW()
+                       GROUP BY `lots`.`id`
+                       LIMIT ?, ?;";
+        $lots = $this->db->get_data_from_db($query_lots, ["%$key%", "%$key%", $offset, $num]);
+
+        return $lots;
+    }
+
+    public function get_expired_lots() {
+        $query_lots = "SELECT `lots`.`id`, `bets`.`user_id`, `bets`.`sum`, `users`.`email`, `lots`.`title` FROM `lots`
+               LEFT JOIN `bets` ON `bets`.`lot_id` = `lots`.`id`
+               INNER JOIN `users` ON `bets`.`user_id` = `users`.`id`
+               WHERE `lots`.`expire` <= NOW() AND `lots`.`winner_id` IS NULL
+               ORDER BY `lots`.`expire` DESC
+               LIMIT 1;";
+        $lot = $this->db->get_data_from_db($query_lots);
+
+        return $lot;
+    }
 }
