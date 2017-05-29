@@ -8,7 +8,7 @@ class Lots_repository extends Queries_repository
 {
     /**
      * находит все открытые лоты
-     * @return array
+     * @return array массив данных о всех открытых лотах
      */
     public function get_all_opened_lots() {
         $query_lots = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.`description`, `lots`.`image`, `lots`.`start_price`, `lots`.`expire`, `categories`.`name` FROM `lots` 
@@ -21,9 +21,27 @@ class Lots_repository extends Queries_repository
     }
 
     /**
+     * @param integer $category_id идентификатор категории
+     * @param integer $offset отступ
+     * @param integer $limit максимальное количество выводимых даннх
+     * @return array массив данных о всех открытых лотах, либо пустой массив
+     */
+
+    public function get_all_opened_lots_by_category_id($category_id, $offset, $limit) {
+        $query_lots = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.`description`, `lots`.`image`, `lots`.`start_price`, `lots`.`expire`, `categories`.`name` FROM `lots` 
+               INNER JOIN `categories` ON `categories`.`id` = `lots`.`category_id`
+               WHERE `lots`.`expire` > NOW() AND `categories`.`id` = ?
+               ORDER BY `lots`.`register_date` DESC
+               LIMIT ?, ?;";
+        $lots = $this->db->get_data_from_db($query_lots, [$category_id, $offset, $limit]);
+
+        return $lots;
+    }
+
+    /**
      * находит лот по его идентификатору
-     * @param $id
-     * @return array
+     * @param integer $id идентификатор лота
+     * @return array массив данных о лоте, либо пустой массив
      */
     public function get_lot_by_id($id) {
         $query_lot = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.`description`, `lots`.`image`, `lots`.`start_price`,
@@ -82,6 +100,15 @@ class Lots_repository extends Queries_repository
         $query_lots = "SELECT COUNT(*) as `num_of_lots` FROM `lots` 
                        WHERE (`title` LIKE ? OR `description` LIKE ?) AND `expire` > NOW();";
         $lots = $this->db->get_data_from_db($query_lots, ["%$key%", "%$key%"])[0]['num_of_lots'];
+
+        return $lots;
+    }
+
+    public function get_num_of_lots_by_category_id($category_id) {
+        $query_lots = "SELECT COUNT(*) as `num_of_lots` FROM `lots`
+                       INNER JOIN `categories` ON `categories`.`id` = `lots`.`category_id`
+                       WHERE `categories`.`id` = ? AND `expire` > NOW();";
+        $lots = $this->db->get_data_from_db($query_lots, [$category_id])[0]['num_of_lots'];
 
         return $lots;
     }

@@ -3,7 +3,7 @@
         <ul class="nav__list container">
             <?php foreach ($categories as $index => $category): ?>
                 <li class="nav__item">
-                    <a href=""><?= $category['name'] ?></a>
+                    <a href="all_lots.php?category_id=<?= $category['id'] ?>"><?= $category['name'] ?></a>
                 </li>
             <?php endforeach; ?>
         </ul>
@@ -17,7 +17,7 @@
             <?php else: ?>
             <h2>Результаты поиска по запросу &laquo;<span><?= $search['query'] ?>&raquo;</span></h2>
             <ul class="lots__list">
-                    <?php foreach ($search['result'][$page] as $index => $item): ?>
+                    <?php foreach ($search['result'] as $index => $item): ?>
                 <li class="lots__item lot">
                     <div class="lot__image">
                         <img src="<?= $item['image'] ?>" width="350" height="260" alt="<?= htmlspecialchars($item['title']) ?>">
@@ -41,11 +41,11 @@
             <?php endif; ?>
         </section>
         <ul class="pagination-list">
-            <li class="pagination-item pagination-item-prev"><a <?= $page ? 'href="search.php?page=' . ($page - 1) . "&search={$search['query']}" . '"' : '' ?>>Назад</a></li>
+            <li class="pagination-item pagination-item-prev"><a <?= $page - 1 ? 'href="search.php?page=' . ($page - 1) . "&search={$search['query']}" . '"' : '' ?>>Назад</a></li>
             <?php for ($i = 1; $i <= $search['num_of_pages']; $i++): ?>
-            <li class="pagination-item <?= $page === $i - 1 ? 'pagination-item-active' : ''?>"><a <?= $page === $i - 1 ? '' : "href=\"{$_SERVER['SCRIPT_NAME']}?page=" . ($i - 1) . "&search={$search['query']}" . '"'?>><?= $i ?></a></li>
+            <li class="pagination-item <?= intval($page) === $i ? 'pagination-item-active' : ''?>"><a <?= intval($page) === $i ? '' : "href=\"{$_SERVER['SCRIPT_NAME']}?page=" . $i . "&search={$search['query']}" . '"'?>><?= $i ?></a></li>
             <?php endfor; ?>
-            <li class="pagination-item pagination-item-next"><a <?= $page < $search['num_of_pages'] - 1 ? 'href="search.php?page=' . ($page + 1) . "&search={$search['query']}" . '"' : '' ?>>Вперед</a></li>
+            <li class="pagination-item pagination-item-next"><a <?= $page < $search['num_of_pages'] ? 'href="search.php?page=' . ($page + 1) . "&search={$search['query']}" . '"' : '' ?>>Вперед</a></li>
         </ul>
     </div>
 </main>

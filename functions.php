@@ -40,7 +40,8 @@ function formatTime($ts) {
 
     if ($ts > $twenty_four_hours) {
         $timeString = ['дней', 'день', 'дня'];
-        $date = (string) ceil($ts / $twenty_four_hours);
+        $days = ceil($ts / $twenty_four_hours);
+        $date = $days < 10 ? '0' . (string) $days : (string) $days;
     } elseif ($ts >= $one_hour) {
         $timeString = ['часов', 'час', 'часа'];
         $date = gmdate('H', $ts);
@@ -284,21 +285,17 @@ function get_extension($filename) {
     return array_pop(explode('.', $filename));
 }
 
-function search(Lots_repository $lots_queries, $lots_per_page) {
-    $query = htmlspecialchars(trim($_GET['search']));
-
+function search(Lots_repository $lots_queries, $search_query, $page, $lots_per_page) {
+    $query = htmlspecialchars(trim($search_query));
     $num_of_lots = $lots_queries->get_num_of_lots_by_key($query);
     $num_of_pages = ceil($num_of_lots / $lots_per_page);
-
     $result = [];
 
-    if (!empty($_GET['search'])) {
-        for ($i = 0; $i < $num_of_lots; $i += $lots_per_page) {
-            $result[] = $lots_queries->get_lots_by_key($query, $i, $lots_per_page);
-        }
+    if ($query) {
+        $result = $lots_queries->get_lots_by_key($query, ($page - 1) * $lots_per_page, $lots_per_page);
     }
-    
-    return ['result' => $result, 'num_of_lots' => $num_of_lots, 'num_of_pages' => $num_of_pages, 'query' => $query];
+
+    return ['result' => $result, 'num_of_lots' => $num_of_lots, 'query' => $query, 'num_of_pages' => $num_of_pages];
 }
 
 function format_bets_string($num_of_bets) {

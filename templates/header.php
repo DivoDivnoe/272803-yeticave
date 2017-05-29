@@ -7,7 +7,7 @@
         <form class="main-header__search" method="get" action="search.php">
             <input type="search" name="search" placeholder="Поиск лота">
             <input class="main-header__search-btn" type="submit" name="find" value="Найти">
-            <input type="hidden" name="page" value="0">
+            <input type="hidden" name="page" value="1">
             <span class="form__error"></span>
         </form>
         <a class="main-header__add-lot button" href="add.php">Добавить лот</a>

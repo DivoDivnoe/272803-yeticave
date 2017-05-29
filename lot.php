@@ -36,7 +36,7 @@ if (isset($_POST['cost']) && !$cost_post['error']) {
     <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
-<?= includeTemplate('templates/header.php', array_merge($user->get_user_data())); ?>
+<?= includeTemplate('templates/header.php', $user->get_user_data()); ?>
 <?= includeTemplate('templates/lot-main.php', ['bets' => $bets, 'equip_item' => $lot, 'cost' => $cost_post, 'categories' => $categories, 'my_bet' => $my_bet, 'is_my_lot' => $is_my_lot, 'isAuth' => $user->is_auth_user()]); ?>
 <?= includeTemplate('templates/footer.php', ['categories' => $categories]); ?>
 </body>

@@ -28,7 +28,7 @@ if (isset($_POST['submit']) && !$validate_form) {
     <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
-<?= includeTemplate('templates/header.php', array_merge($user->get_user_data())); ?>
+<?= includeTemplate('templates/header.php', $user->get_user_data()); ?>
 <?= includeTemplate('templates/login_main.php', array_merge($data, ['categories' => $categories])); ?>
 <?= includeTemplate('templates/footer.php', ['categories' => $categories]); ?>
 </body>
