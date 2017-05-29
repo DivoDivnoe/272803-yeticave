@@ -4,7 +4,7 @@
  * Class Bets_repository
  * Репозиторий запросов, связанных со ставками
  */
-class Bets_repository extends Queries_repository
+class BetsRepository extends QueriesRepository
 {
 
     /**
@@ -46,7 +46,7 @@ class Bets_repository extends Queries_repository
      * @param integer $lot_id идентификатор лота
      * @return array массив данных о ставках
      */
-    public function get_bets_by_userId_and_lotId($user_id, $lot_id) {
+    public function get_bets_by_user_id_and_lot_id($user_id, $lot_id) {
         $query_made_bet = "SELECT * FROM `bets` WHERE `user_id` = ? AND `lot_id` = ?";
         $my_bet = $this->db->get_data_from_db($query_made_bet, [$user_id, $lot_id]);
 

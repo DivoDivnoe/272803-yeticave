@@ -4,7 +4,7 @@
  * Class Lots_repository
  * Класс запросов, связанных с лотами
  */
-class Lots_repository extends Queries_repository
+class LotsRepository extends QueriesRepository
 {
     /**
      * находит все открытые лоты
@@ -21,6 +21,7 @@ class Lots_repository extends Queries_repository
     }
 
     /**
+     * находит все открытые лоты определенной категории
      * @param integer $category_id идентификатор категории
      * @param integer $offset отступ
      * @param integer $limit максимальное количество выводимых даннх
@@ -63,7 +64,7 @@ class Lots_repository extends Queries_repository
      * @param integer $lot_id идентификатор лота
      * @return array массив данных о лоте, либо пустой массив
      */
-    public function get_lot_by_lotId_and_authorId($author_id, $lot_id) {
+    public function get_lot_by_lot_id_and_author_id($author_id, $lot_id) {
         $query_is_my_lot = "SELECT * FROM `lots` WHERE `author_id` = ? AND `id` = ?;";
         $is_my_lot = $this->db->get_data_from_db($query_is_my_lot, [$author_id, $lot_id]);
 

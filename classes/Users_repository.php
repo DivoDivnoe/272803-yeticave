@@ -4,7 +4,7 @@
  * Class Users_repository
  * Репозиторий запросов, связанных с пользователями
  */
-class Users_repository extends Queries_repository
+class UsersRepository extends QueriesRepository
 {
     /**
      * находит пользователя по его email
@@ -44,5 +44,17 @@ class Users_repository extends Queries_repository
         $result = $this->db->insert_data_to_db($query, [$email, $name, $password, $avatar, $contacts]);
 
         return $result;
+    }
+
+    /**
+     * проаеряет, существует ли email в базе данных
+     * @param string $email email пользователя
+     * @return bool
+     */
+    public function check_email_in_db($email) {
+        $query = "SELECT `email` FROM `users` WHERE email = ?";
+        $email_list = $this->db->get_data_from_db($query, [$email]);
+
+        return $email_list ? true : false;
     }
 }

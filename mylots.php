@@ -3,11 +3,12 @@
 require_once 'init.php';
 
 if (!$user->is_auth_user()) {
-    send_header('HTTP/1.1 403 Forbidden');
+    header('HTTP/1.1 403 Forbidden');
+    exit;
 }
 
-$categories = $categories_queries->get_all_categories();
-$bets = $bets_queries->get_bets_by_user_email($_SESSION['email']);
+$categories = $categories_repository->get_all_categories();
+$bets = $bets_repository->get_bets_by_user_email($_SESSION['email']);
 ?>
 
 <!DOCTYPE html>
@@ -19,8 +20,8 @@ $bets = $bets_queries->get_bets_by_user_email($_SESSION['email']);
     <link href="../css/style.css" rel="stylesheet">
 </head>
 <body>
-<?= includeTemplate('templates/header.php', $user->get_user_data()); ?>
-<?= includeTemplate('templates/my_lots_main.php', ['my_bets' => $bets, 'categories' => $categories]); ?>
-<?= includeTemplate('templates/footer.php', ['categories' => $categories]); ?>
+<?= include_template('templates/header.php', $user->get_user_data()); ?>
+<?= include_template('templates/my_lots_main.php', ['my_bets' => $bets, 'categories' => $categories]); ?>
+<?= include_template('templates/footer.php', ['categories' => $categories]); ?>
 </body>
 </html>

@@ -9,8 +9,8 @@ if (!isset($_GET['search'])) {
 date_default_timezone_set('Europe/Moscow');
 
 $page = isset($_GET['page']) ? $_GET['page'] : 1;
-$categories = $categories_queries->get_all_categories();
-$search = search($lots_queries, $_GET['search'], $page, 9);
+$categories = $categories_repository->get_all_categories();
+$search = search($lots_repository, $_GET['search'], $page, 9);
 
 ?>
 <!DOCTYPE html>
@@ -22,8 +22,8 @@ $search = search($lots_queries, $_GET['search'], $page, 9);
     <link href="../css/style.css" rel="stylesheet">
 </head>
 <body>
-<?= includeTemplate('templates/header.php', $user->get_user_data()); ?>
-<?= includeTemplate('templates/search_main.php', ['categories' => $categories, 'search' => $search, 'page' => $_GET['page']]);?>
-<?= includeTemplate('templates/footer.php', ['categories' => $categories]); ?>
+<?= include_template('templates/header.php', $user->get_user_data()); ?>
+<?= include_template('templates/search_main.php', ['categories' => $categories, 'search' => $search, 'page' => $_GET['page']]);?>
+<?= include_template('templates/footer.php', ['categories' => $categories]); ?>
 </body>
 </html>

@@ -15,7 +15,7 @@
                 <?php elseif (!$search['result']): ?>
                 <h2>По Вашему запросу ничего не найдено</h2>
             <?php else: ?>
-            <h2>Результаты поиска по запросу &laquo;<span><?= $search['query'] ?>&raquo;</span></h2>
+            <h2>Результаты поиска по запросу &laquo;<span><?= htmlspecialchars($search['query']) ?>&raquo;</span></h2>
             <ul class="lots__list">
                     <?php foreach ($search['result'] as $index => $item): ?>
                 <li class="lots__item lot">

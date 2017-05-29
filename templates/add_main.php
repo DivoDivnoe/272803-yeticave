@@ -8,7 +8,7 @@
             <?php endforeach; ?>
         </ul>
     </nav>
-    <form class="form form--add-lot container <?= $form_class ?>" action="../add.php" method="post" enctype="multipart/form-data"> <!-- form--invalid -->
+    <form class="form form--add-lot container <?= $form_class ?>" action="<?= $_SERVER['SCRIPT_NAME'] ?>" method="post" enctype="multipart/form-data"> <!-- form--invalid -->
         <h2>Добавление лота</h2>
         <div class="form__container-two">
             <div class="form__item <?= $title['class'] ?>"> <!-- form__item--invalid -->
@@ -20,7 +20,6 @@
                 <label for="category">Категория</label>
                 <select id="category" name="category" value="<?= $category_input['value'] ?>">
                     <?php foreach ($category_input['options'] as $index => $option): ?>
-
                         <option <?= ($index === $category_input['selected'] ? 'selected' : '') ?>><?= $option ?></option>
                     <?php endforeach; ?>
                 </select>

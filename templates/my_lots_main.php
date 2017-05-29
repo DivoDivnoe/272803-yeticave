@@ -29,7 +29,7 @@
                         <?= $bet['sum'] ?>
                     </td>
                     <td class="rates__time">
-                        <?= ts2relative(strtotime($bet['date'])) ?>
+                        <?= ts_2_relative(strtotime($bet['date'])) ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

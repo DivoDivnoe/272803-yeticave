@@ -2,14 +2,14 @@
 
 require_once 'init.php';
 
-$categories = $categories_queries->get_all_categories();
+$categories = $categories_repository->get_all_categories();
 
 $email_post = check_email('email');
-$pass_post = checkTextInput('password');
-$validate_form = checkLotForm([$email_post, $pass_post]);
+$pass_post = check_text_input('password');
+$validate_form = check_lot_form([$email_post, $pass_post]);
 
 if (isset($_POST['submit']) && !$validate_form) {
-    $user->auth_user($users_queries, $_POST['email'], $_POST['password']);
+    $user->auth_user($users_repository, $_POST['email'], $_POST['password']);
 
     if ($user->is_auth_user()) {
         header('Location: /index.php');
@@ -28,8 +28,8 @@ if (isset($_POST['submit']) && !$validate_form) {
     <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
-<?= includeTemplate('templates/header.php', $user->get_user_data()); ?>
-<?= includeTemplate('templates/login_main.php', array_merge($data, ['categories' => $categories])); ?>
-<?= includeTemplate('templates/footer.php', ['categories' => $categories]); ?>
+<?= include_template('templates/header.php', $user->get_user_data()); ?>
+<?= include_template('templates/login_main.php', array_merge($data, ['categories' => $categories])); ?>
+<?= include_template('templates/footer.php', ['categories' => $categories]); ?>
 </body>
 </html>
