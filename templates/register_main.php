@@ -39,7 +39,7 @@
                 </div>
             </div>
             <div class="form__input-file <?= $user_file['class'] ?>">
-                <input class="visually-hidden" type="file" id="photo2" value="user_file">
+                <input class="visually-hidden" type="file" id="photo2" name="user_file">
                 <label for="photo2">
                     <span>+ Добавить</span>
                 </label>
