@@ -29,7 +29,7 @@ class User
     /**
      * @var bool $isAuth указывает, авторизован ли пользователь
      */
-    protected $isAuth;
+    protected $is_auth;
     /**
      * @var string $register_date дата регистрации пользователя
      */
@@ -37,9 +37,9 @@ class User
 
     /**
      * User constructor.
-     * @param Users_repository $users_queries объект библиотеки запросов связанных с пользователем
+     * @param UsersRepository $users_queries объект библиотеки запросов связанных с пользователем
      */
-    public function __construct(Users_repository $users_queries)
+    public function __construct(UsersRepository $users_queries)
     {
         if (isset($_SESSION['email'])) {
             $this->email = $_SESSION['email'];
@@ -62,9 +62,9 @@ class User
     public function get_user_data()
     {
         if ($this->isAuth) {
-            $data = ['id' => $this->id, 'name' => $this->name, 'email' => $this->email, 'avatar' => $this->avatar, 'isAuth' => true];
+            $data = ['id' => $this->id, 'name' => $this->name, 'email' => $this->email, 'avatar' => $this->avatar, 'is_auth' => true];
         } else {
-            $data = ['isAuth' => false];
+            $data = ['is_auth' => false];
         }
         return $data;
     }
@@ -80,12 +80,12 @@ class User
 
     /**
      * производит аутентификацию пользователя
-     * @param Users_repository $users_queries репозиторий запросов, связанных с пользователями
+     * @param UsersRepository $users_queries репозиторий запросов, связанных с пользователями
      * @param string $email введённый пользователем email
      * @param string $pass введённый пользователем пароль
 
      */
-    public function auth_user(Users_repository $users_queries, $email, $pass)
+    public function auth_user(UsersRepository $users_queries, $email, $pass)
     {
         $result = $users_queries->get_password_by_email($email);
 

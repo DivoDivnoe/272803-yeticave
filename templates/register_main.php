@@ -3,7 +3,7 @@
         <ul class="nav__list container">
             <?php foreach ($categories as $index => $category): ?>
                 <li class="nav__item">
-                    <a href="all-lots.html"><?= $category['name'] ?></a>
+                    <a href="all_lots.php?category_id=<?= $category['id'] ?>"><?= $category['name'] ?></a>
                 </li>
             <?php endforeach; ?>
         </ul>
@@ -39,7 +39,7 @@
                 </div>
             </div>
             <div class="form__input-file <?= $user_file['class'] ?>">
-                <input class="visually-hidden" type="file" id="photo2" value="user_file">
+                <input class="visually-hidden" type="file" id="photo2" name="user_file">
                 <label for="photo2">
                     <span>+ Добавить</span>
                 </label>

@@ -1,12 +1,17 @@
 <?php
 
-
-function includeTemplate($path, $data = []) {
+/**
+ * вставляет шаблон
+ * @param string $path путь к шаблону
+ * @param array $data массив данных для подстановки в шаблон
+ * @return string шаблон со вставленными данными
+ */
+function include_template($path, $data = []) {
     if (!file_exists($path)) {
         return '';
     }
     array_walk_recursive($data, function(&$value) {
-        $value = my_strip_tags($value);
+        $value = htmlspecialchars($value);
     });
     extract($data);
 
@@ -17,30 +22,37 @@ function includeTemplate($path, $data = []) {
     return ob_get_clean();
 }
 
-function my_strip_tags($data) {
-    return is_string($data) ? htmlspecialchars(strip_tags($data)) : $data;
-}
-
-function ts2relative($ts) {
+/**
+ * переводит timestamp в относительный формат
+ * @param integer $ts timestamp
+ * @return string строка отформатированной даты в относительном формате
+ */
+function ts_2_relative($ts) {
     $twenty_four_hours = 24 * 60 * 60;
     $dif = time() - $ts;
 
     if ($dif > $twenty_four_hours) {
         $date = date('d.m.y в H:i' , $ts);
     }  else {
-        $date = formatTime($dif) . ' назад';
+        $date = format_time($dif) . ' назад';
     }
 
     return $date;
 }
 
-function formatTime($ts) {
+/**
+ * показывает сколько времени прошло с метки timestamp
+ * @param integer $ts timestamp
+ * @return string строка отформатированной даты
+ */
+function format_time($ts) {
     $one_hour = 60 * 60;
     $twenty_four_hours = 24 * 60 * 60;
 
     if ($ts > $twenty_four_hours) {
         $timeString = ['дней', 'день', 'дня'];
-        $date = (string) ceil($ts / $twenty_four_hours);
+        $days = ceil($ts / $twenty_four_hours);
+        $date = $days < 10 ? '0' . (string) $days : (string) $days;
     } elseif ($ts >= $one_hour) {
         $timeString = ['часов', 'час', 'часа'];
         $date = gmdate('H', $ts);
@@ -63,25 +75,30 @@ function formatTime($ts) {
     return $result_str;
 }
 
+/**
+ * показывает, сколько осталось времени до метки timestamp
+ * @param string $time строка с датой
+ * @return string строка оставшегося времени
+ */
 function show_left_time($time) {
     $ts_left = strtotime($time) - time();
     $twenty_four_hours = 24 * 60 * 60;
 
     if ($ts_left < $twenty_four_hours) {
-        $left_time = date('H:i', $ts_left);
+        $left_time = gmdate('H:i', $ts_left);
     } else {
-        $left_time = formatTime($ts_left);
+        $left_time = format_time($ts_left);
     }
 
     return $left_time;
 }
 
-function send_header($text) {
-    header($text);
-    exit;
-}
-
-function checkTextInput($text) {
+/**
+ * проверяет поле ввода текста на корректность
+ * @param string $text строка введенного текста
+ * @return array массив с классом формы, текстом ошибки и введенным в проверяемое поле значением
+ */
+function check_text_input($text) {
     $class = '';
     $error = '';
     $value = '';
@@ -98,6 +115,11 @@ function checkTextInput($text) {
     return ['class' => $class, 'error' => $error, 'value' => $value];
 }
 
+/**
+ * проверяет введенный email на корректность
+ * @param string $email введенный email
+ * @return array массив с классом формы, текстом ошибки и введенным в проверяемое поле значением
+ */
 function check_email($email) {
     $class = '';
     $error = '';
@@ -115,15 +137,13 @@ function check_email($email) {
     return ['class' => $class, 'error' => $error, 'value' => $value];
 }
 
-function check_email_in_db(Database $db, $email) {
-    $query = "SELECT `email` FROM `users` WHERE email = ?";
-    $db->get_data_from_db($query, [$email]);
-    $email_list = $db->get_last_query_result();
-
-    return $email_list ? true : false;
-}
-
-function checkSelectInput($name, $options) {
+/**
+ * проверяет, выбрана ли одна из опций в поле ввода типа select
+ * @param string $name имя поля ввода
+ * @param array $options массив опций
+ * @return array массив с классом формы, текстом ошибки, выбранной опцией, массив опций и индекс выбранной опции
+ */
+function check_select_input($name, $options) {
     $class = '';
     $error = '';
     $selected = 0;
@@ -143,7 +163,12 @@ function checkSelectInput($name, $options) {
     return ['class' => $class, 'error' => $error, 'value' => $value, 'options' => $options, 'selected' => $selected];
 }
 
-function checkNumberInput($num) {
+/**
+ * проверяет на корректность поле ввода чисел
+ * @param integer $num введенное число
+ * @return array массив с классом формы, текстом ошибки и введенным в проверяемое поле значением
+ */
+function check_number_input($num) {
     $class = '';
     $error = '';
     $value = '';
@@ -168,7 +193,14 @@ function checkNumberInput($num) {
     return ['class' => $class, 'error' => $error, 'value' => $value];
 }
 
-function checkFileInput($user_file, $image_folder, $required = false) {
+/**
+ * проверяет поле загрузки файла
+ * @param string $user_file имя поля загрузки файла
+ * @param string $image_folder директория, куда будет загружен файл
+ * @param bool $required наличие required
+ * @return array массив с классом формы, текстом ошибки и строкой адреса загруженного файла
+ */
+function check_file_input($user_file, $image_folder, $required = false) {
     $class = '';
     $error = '';
     $url = null;
@@ -205,6 +237,11 @@ function checkFileInput($user_file, $image_folder, $required = false) {
     return ['class' => $class, 'error' => $error, 'url' => $url];
 }
 
+/**
+ * проверяет поле ввода даты на корректность
+ * @param string $date имя поля ввода даты
+ * @return array массив с классом формы, текстом ошибки и введенным в проверяемое поле значением
+ */
 function check_date($date) {
     $class = '';
     $error = '';
@@ -218,7 +255,8 @@ function check_date($date) {
             $error = 'Заполните это поле';
         } else {
             $date_array = explode('.', $value);
-            $date_is_valid = checkdate($date_array[1], $date_array[0], $date_array[2]) && strtotime($value) > strtotime('today midnight');
+            $date_is_valid = checkdate($date_array[1], $date_array[0], $date_array[2]) &&
+                             strtotime($value) > strtotime('today midnight');
 
             if (!$date_is_valid) {
                 $class = 'form__item--invalid';
@@ -230,7 +268,12 @@ function check_date($date) {
     return ['class' => $class, 'error' => $error, 'value' => $value];
 }
 
-function checkLotForm($checkedFields) {
+/**
+ * проверяет всю форму целиком на корректность
+ * @param array $checkedFields массив проверяемых полей
+ * @return string строка с классом формы
+ */
+function check_lot_form($checkedFields) {
     foreach ($checkedFields as $value) {
         if ($value['class']) {
             return 'form--invalid';
@@ -240,6 +283,11 @@ function checkLotForm($checkedFields) {
     return '';
 }
 
+/**
+ * показывает ошибку в случае неудачной аутентификации
+ * @param User $user объект класса пользователь
+ * @return array массив с классом формы и текстом ошибки
+ */
 function show_auth_user(User $user) {
     $class = 'form__item--invalid';
     $error = 'Комбинация пользователь - пароль неверна';
@@ -252,52 +300,99 @@ function show_auth_user(User $user) {
     return ['class' => $class, 'error' => $error];
 }
 
-function register_user(Database $db, Users_repository $users_queries, $email, $name, $password, $avatar, $contacts) {
+/**
+ * регистрация пользователя
+ * @param UsersRepository $users_repository объект запросов, связанных с пользователем
+ * @param string $email поле ввода email
+ * @param string $name поле ввода имени пользователя
+ * @param string $password поле ввода пароля
+ * @param string $avatar поле загрузки изображения пользователя
+ * @param string $contacts поле ввода контактов пользователя
+ * @return array массив с классом формы и текстом ошибки
+ */
+function register_user(UsersRepository $users_repository, $email, $name, $password, $avatar, $contacts) {
     $class = 'form__item--invalid';
     $error = 'Пользователь с таким email уже зарегистрирован';
 
-    $email_in_db = check_email_in_db($db, $email);
+    $email_in_db = $users_repository->check_email_in_db($email);
     if (!$email_in_db) {
         $class = '';
         $error = '';
 
-        $users_queries->add_new_user($email, $name, $password, $avatar, $contacts);
+        $users_repository->add_new_user($email, $name, $password, $avatar, $contacts);
     }
 
     return ['class' => $class, 'error' => $error];
 }
 
-function addBet($bet, $lot_id) {
-    $bet_data = ['cost' => $bet, 'date' => time()];
-    $bet_data = json_encode($bet_data);
-    $expire = strtotime('+1 year');
-
-    setcookie("my_bets[{$lot_id}]", $bet_data, $expire, '/');
-}
-
-function generate_unique_name($name)
-{
+/**
+ * генерирует случайное имя файла изображения
+ * @param string $name оригинальное имя файла
+ * @return string уникальное имя файла
+ */
+function generate_unique_name($name) {
     $extension = get_extension($name);
     return md5($name) . time() . '.' . $extension;
 }
 
+/**
+ * получает расширение файла
+ * @param string $filename имя файла
+ * @return string mixed расширения файла
+ */
 function get_extension($filename) {
     return array_pop(explode('.', $filename));
 }
 
-/*function search($connection) {
-    $search_get = checkTextInput('search');
-    $search = $_GET['search'];
-    $result = '';
+/**
+ * осуществляет поиск в базе данных по ключевому слову
+ * @param LotsRepository $lots_queries объект запросов, связанных с лотами
+ * @param string $search_query строка запроса для поиска
+ * @param string $page текущая страница
+ * @param integer $lots_per_page количество лотов на странице
+ * @return array массив с результатом поиска, общим количеством лотов, строкой запроса и количеством страниц
+ */
+function search(LotsRepository $lots_queries, $search_query, $page, $lots_per_page) {
+    $query = trim($search_query);
+    $num_of_lots = $lots_queries->get_num_of_lots_by_key($query);
+    $num_of_pages = ceil($num_of_lots / $lots_per_page);
+    $result = [];
 
-    if (!$search_get['error']) {
-        $query = "SELECT `lots`.`id`, `lots`.`category_id`, `lots`.`title`, `lots`.`description`, `lots`.`image`, `lots`.`start_price`, `lots`.`expire`, `categories`.`name` FROM `lots` 
-               INNER JOIN `categories` ON `categories`.`id` = `lots`.`category_id`
-               WHERE `lots`.`expire` > NOW() AND (`lots`.`title` LIKE ? OR `lots`.`description` LIKE ?)
-               ORDER BY `lots`.`register_date` DESC;";
-
-        $result = get_data_from_db($connection, $query, ["%$search%", "%$search%"]);
+    if ($query) {
+        $result = $lots_queries->get_lots_by_key($query, ($page - 1) * $lots_per_page, $lots_per_page);
     }
 
-    return ['error' => $search_get['error'], 'result' => $result];
-}*/
+    return ['result' => $result, 'num_of_lots' => $num_of_lots, 'query' => $query, 'num_of_pages' => $num_of_pages];
+}
+
+/**
+ * возвращает строку с количеством ставок
+ * @param integer $num_of_bets количество ставок
+ * @return string строка с количеством ставок
+ */
+function format_bets_string($num_of_bets) {
+    $bet_string = ['ставок', 'ставка', 'ставки'];
+
+    $num_of_bets = (string) $num_of_bets;
+    $num_of_bets_length = strlen($num_of_bets);
+
+    if ($num_of_bets_length === 1) {
+        $last_char = $num_of_bets;
+        $before_last_char = 0;
+    } else {
+        $last_char = substr($num_of_bets, -1);
+        $before_last_char = substr($num_of_bets, -2, 1);
+    }
+
+    $last_chars = ['1', '2', '3', '4'];
+
+    if (!in_array($last_char, $last_chars) || $before_last_char === '1') {
+        $result_str = $num_of_bets .  ' ' . $bet_string[0];
+    } else if ($last_char === '1') {
+        $result_str = $num_of_bets .  ' ' . $bet_string[1];
+    } else {
+        $result_str = $num_of_bets .  ' ' . $bet_string[2];
+    }
+
+    return $result_str;
+}

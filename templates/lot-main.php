@@ -3,7 +3,7 @@
         <ul class="nav__list container">
             <?php foreach ($categories as $index => $category): ?>
                 <li class="nav__item">
-                    <a href=""><?= $category['name'] ?></a>
+                    <a href="all_lots.php?category_id=<?= $category['id'] ?>"><?= $category['name'] ?></a>
                 </li>
             <?php endforeach; ?>
         </ul>
@@ -19,7 +19,7 @@
                 <p class="lot-item__description"><?= htmlspecialchars($equip_item['description']) ?></p>
             </div>
             <div class="lot-item__right">
-                <?php if ($isAuth && !$my_bet && !$is_my_lot): ?>
+                <?php if ($is_auth && !$my_bet && !$is_my_lot): ?>
                     <div class="lot-item__state">
                         <div class="lot-item__timer timer">
                             <?= show_left_time(htmlspecialchars($equip_item['expire'])); ?>
@@ -51,7 +51,7 @@
                             <tr class="history__item">
                                 <td class="history__name"><?= htmlspecialchars($bet['name']) ?></td>
                                 <td class="history__price"><?= $bet['sum'] . ' р.' ?></td>
-                                <td class="history__time"><?= ts2relative(strtotime($bet['date'])) ?></td>
+                                <td class="history__time"><?= ts_2_relative(strtotime($bet['date'])) ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </table>

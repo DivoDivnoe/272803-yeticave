@@ -12,10 +12,10 @@ require_once 'functions.php';
 session_start();
 
 $db = new Database('localhost', 'root', '', 'yeticave');
-$users_queries = new Users_repository($db);
-$categories_queries = new Categories_repository($db);
-$lots_queries = new Lots_repository($db);
-$bets_queries = new Bets_repository($db);
-$user = new User($users_queries);
+$users_repository = new UsersRepository($db);
+$categories_repository = new CategoriesRepository($db);
+$lots_repository = new LotsRepository($db);
+$bets_repository = new BetsRepository($db);
+$user = new User($users_repository);
 
 

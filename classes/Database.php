@@ -123,40 +123,31 @@ class Database
      * выполняет запрос с применением подготовленного выражения
      * по боновлению данных
      * @param string $table имя таблицы
-     * @param array $data массив с данным для вставки
+     * @param array $data массив с данными для вставки
      * в подготовленное выражения
-     * @param array $where_data массив с данным для вставки
+     * @param array $where_data массив с данными для вставки
      * в подготовленное выражения в качестве условия
      * @return mixed
      */
     public function update_db_data($table, $data, $where_data) {
-        $where_columns = array_keys($where_data);
         $result_or_count = 0;
-
-        foreach ($data as $index => $field) {
-            $query = "UPDATE $table SET";
-
-            foreach ($field as $column => $value) {
-                $query .= " $column = ?,";
-            }
-
-            $query = rtrim($query, ',');
-            $where_column = $where_columns[$index];
-            $query .= " WHERE $where_column = ?;\n";
-            $merged_data = array_merge($field, array_slice($where_data, $index, 1));
-            $stmt = $this->db_get_prepare_stmt($query, $merged_data);
-            $result = mysqli_stmt_execute($stmt);
-            mysqli_stmt_close($stmt);
+        $query = "UPDATE $table SET";
+        foreach ($data as $column => $value) {
+            $query .= " $column = ?,";
+        }
+        $query = rtrim($query, ',');
+        $query .= ' WHERE ' . array_keys($where_data)[0] . ' = ?;';
+        $merged_data = array_merge($data, $where_data);
+        $stmt = $this->db_get_prepare_stmt($query, $merged_data);
+        $result = mysqli_stmt_execute($stmt);
 
             if (!$result) {
                 $result_or_count = false;
-                break;
             } else {
                 $result_or_count++;
             }
-        }
-
         $this->last_query_result =  $result_or_count;
+
         return $this->last_query_result;
     }
 
