@@ -1,8 +1,28 @@
 <?php
-require_once 'init.php';
+
+require_once 'classes/Database.php';
+require_once 'classes/User.php';
+require_once 'classes/Categories_repository.php';
+require_once 'classes/Lots_repository.php';
+require_once 'classes/Bets_repository.php';
+require_once 'classes/Users_repository.php';
+require_once 'functions/form_validate_functions.php';
+require_once 'functions/include_template_function.php';
+require_once 'functions/format_functions.php';
+require_once 'configs/database_connect_data.php';
+
+session_start();
+
+$db = new Database(...$connect_data);
+$users_repository = new UsersRepository($db);
+$user = new User($users_repository);
+$categories_repository = new CategoriesRepository($db);
+$lots_repository = new LotsRepository($db);
+$bets_repository = new BetsRepository($db);
 
 if (!isset($_GET['lot_id'])) {
-    send_header('HTTP/1.1 404 Not Found');
+    header('HTTP/1.1 404 Not Found');
+    exit;
 }
 
 date_default_timezone_set('Europe/Moscow');
@@ -37,10 +57,15 @@ if (isset($_POST['cost']) && !$cost_post['error']) {
 </head>
 <body>
 <?= include_template('templates/header.php', $user->get_user_data()); ?>
-<?= include_template('templates/lot-main.php', [ 'bets' => $bets, 'equip_item' => $lot, 'cost' => $cost_post,
-                                                 'categories' => $categories, 'my_bet' => $my_bet,
-                                                 'is_my_lot' => $is_my_lot, 'is_auth' => $user->is_auth_user() ]); ?>
+<?= include_template('templates/lot-main.php', [
+    'bets' => $bets,
+    'equip_item' => $lot,
+    'cost' => $cost_post,
+    'categories' => $categories,
+    'my_bet' => $my_bet,
+    'is_my_lot' => $is_my_lot,
+    'is_auth' => $user->is_auth_user()
+]); ?>
 <?= include_template('templates/footer.php', ['categories' => $categories]); ?>
 </body>
 </html>
-

@@ -1,6 +1,21 @@
 <?php
 
-require_once 'init.php';
+require_once 'classes/Database.php';
+require_once 'classes/User.php';
+require_once 'classes/Categories_repository.php';
+require_once 'classes/Bets_repository.php';
+require_once 'classes/Users_repository.php';
+require_once 'configs/database_connect_data.php';
+require_once 'functions/include_template_function.php';
+require_once 'functions/format_functions.php';
+
+session_start();
+
+$db = new Database(...$connect_data);
+$users_repository = new UsersRepository($db);
+$user = new User($users_repository);
+$categories_repository = new CategoriesRepository($db);
+$bets_repository = new BetsRepository($db);
 
 if (!$user->is_auth_user()) {
     header('HTTP/1.1 403 Forbidden');

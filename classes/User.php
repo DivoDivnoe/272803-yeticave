@@ -1,10 +1,10 @@
 <?php
+
 /**
  * Класс пользователь. Содержит методы для управления
  * пользователем.
  * @package yeticave/classes
  */
-
 class User
 {
     /**
@@ -62,7 +62,13 @@ class User
     public function get_user_data()
     {
         if ($this->isAuth) {
-            $data = ['id' => $this->id, 'name' => $this->name, 'email' => $this->email, 'avatar' => $this->avatar, 'is_auth' => true];
+            $data = [
+                'id' => $this->id,
+                'name' => $this->name,
+                'email' => $this->email,
+                'avatar' => $this->avatar,
+                'is_auth' => true
+            ];
         } else {
             $data = ['is_auth' => false];
         }
@@ -83,7 +89,6 @@ class User
      * @param UsersRepository $users_queries репозиторий запросов, связанных с пользователями
      * @param string $email введённый пользователем email
      * @param string $pass введённый пользователем пароль
-
      */
     public function auth_user(UsersRepository $users_queries, $email, $pass)
     {

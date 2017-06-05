@@ -14,22 +14,22 @@
 
         <nav class="user-menu">
             <?php if ($is_auth): ?>
-            <div class="user-menu__image">
-                <img src="<?= $avatar ?>" width="40" height="40" alt="Пользователь">
-            </div>
-            <div class="user-menu__logged">
-                <p><?= $name ?></p>
-                <a href="logout.php">Выйти</a>
-            </div>
+                <div class="user-menu__image">
+                    <img src="<?= $avatar ?>" width="40" height="40" alt="Пользователь">
+                </div>
+                <div class="user-menu__logged">
+                    <p><?= $name ?></p>
+                    <a href="logout.php">Выйти</a>
+                </div>
             <?php else: ?>
-            <ul class="user-menu__list">
-                <li class="user-menu__item">
-                    <a href="register.php">Регистрация</a>
-                </li>
-                <li class="user-menu__item">
-                    <a href="login.php">Вход</a>
-                </li>
-            </ul>
+                <ul class="user-menu__list">
+                    <li class="user-menu__item">
+                        <a href="register.php">Регистрация</a>
+                    </li>
+                    <li class="user-menu__item">
+                        <a href="login.php">Вход</a>
+                    </li>
+                </ul>
             <?php endif; ?>
         </nav>
     </div>

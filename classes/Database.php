@@ -4,7 +4,6 @@
  * Класс для работы с базой данных
  * @package yeticave/classes
  */
-
 class Database
 {
     /**
@@ -41,7 +40,7 @@ class Database
      * @param string $password пароль пользователя базы данных
      * @param string $db имя базы данных
      */
-     function connect_to_db($host_name, $user, $password, $db)
+    function connect_to_db($host_name, $user, $password, $db)
     {
         $connection = mysqli_connect($host_name, $user, $password, $db);
         $this->connection = $connection;
@@ -56,7 +55,8 @@ class Database
      * возвращает результат последнего запроса
      * @return mixed
      */
-    public function get_last_query_result() {
+    public function get_last_query_result()
+    {
         return $this->last_query_result;
     }
 
@@ -64,7 +64,8 @@ class Database
      * Выполненяет элементарные запросы
      * @param string $query
      */
-    public function get_query_result($query) {
+    public function get_query_result($query)
+    {
         $result = mysqli_query($this->connection, $query);
         $this->check_query_result($result);
     }
@@ -97,7 +98,8 @@ class Database
      * в подготовленное выражения
      * @return array
      */
-    public function get_data_from_db($query, $data = []) {
+    public function get_data_from_db($query, $data = [])
+    {
         $stmt = $this->db_get_prepare_stmt($query, $data);
         $result = mysqli_stmt_execute($stmt);
 
@@ -113,7 +115,8 @@ class Database
      * в подготовленное выражения
      * @return mixed
      */
-    public function insert_data_to_db($query, $data) {
+    public function insert_data_to_db($query, $data)
+    {
         $result = mysqli_stmt_execute($this->db_get_prepare_stmt($query, $data));
         $this->last_query_result = $result ? mysqli_insert_id($this->connection) : $result;
         return $this->last_query_result;
@@ -129,7 +132,8 @@ class Database
      * в подготовленное выражения в качестве условия
      * @return mixed
      */
-    public function update_db_data($table, $data, $where_data) {
+    public function update_db_data($table, $data, $where_data)
+    {
         $result_or_count = 0;
         $query = "UPDATE $table SET";
         foreach ($data as $column => $value) {
@@ -141,12 +145,12 @@ class Database
         $stmt = $this->db_get_prepare_stmt($query, $merged_data);
         $result = mysqli_stmt_execute($stmt);
 
-            if (!$result) {
-                $result_or_count = false;
-            } else {
-                $result_or_count++;
-            }
-        $this->last_query_result =  $result_or_count;
+        if (!$result) {
+            $result_or_count = false;
+        } else {
+            $result_or_count++;
+        }
+        $this->last_query_result = $result_or_count;
 
         return $this->last_query_result;
     }
@@ -163,7 +167,7 @@ class Database
     {
         $stmt = mysqli_prepare($this->connection, $sql);
 
-        if(!$stmt) {
+        if (!$stmt) {
             $this->error = "Ошибка подготовки запроса: " . mysqli_error($this->connection);
             return false;
         }
@@ -177,12 +181,14 @@ class Database
 
                 if (is_int($value)) {
                     $type = 'i';
-                }
-                else if (is_string($value)) {
-                    $type = 's';
-                }
-                else if (is_double($value)) {
-                    $type = 'd';
+                } else {
+                    if (is_string($value)) {
+                        $type = 's';
+                    } else {
+                        if (is_double($value)) {
+                            $type = 'd';
+                        }
+                    }
                 }
 
                 if ($type) {

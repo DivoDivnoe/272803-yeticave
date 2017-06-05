@@ -17,13 +17,15 @@
                         <div class="rates__img">
                             <img src="<?= $bet['image'] ?>" width="54" height="40" alt="<?= $bet['title'] ?>">
                         </div>
-                        <h3 class="rates__title"><a href="lot.php?lot_id=<?= $bet['id'] ?>"><?= $bet['title'] ?></a></h3>
+                        <h3 class="rates__title"><a href="lot.php?lot_id=<?= $bet['id'] ?>"><?= $bet['title'] ?></a>
+                        </h3>
                     </td>
                     <td class="rates__category">
                         <?= $bet['name'] ?>
                     </td>
                     <td class="rates__timer">
-                        <div class="timer timer--finishing"><?= show_left_time(htmlspecialchars($bet['expire'])) ?></div>
+                        <div
+                            class="timer timer--finishing"><?= show_left_time(htmlspecialchars($bet['expire'])) ?></div>
                     </td>
                     <td class="rates__price">
                         <?= $bet['sum'] ?>

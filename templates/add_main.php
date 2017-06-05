@@ -8,19 +8,21 @@
             <?php endforeach; ?>
         </ul>
     </nav>
-    <form class="form form--add-lot container <?= $form_class ?>" action="<?= $_SERVER['SCRIPT_NAME'] ?>" method="post" enctype="multipart/form-data"> <!-- form--invalid -->
+    <form class="form form--add-lot container <?= $form_class ?>" action="<?= $_SERVER['SCRIPT_NAME'] ?>" method="post"
+          enctype="multipart/form-data"> <!-- form--invalid -->
         <h2>Добавление лота</h2>
         <div class="form__container-two">
             <div class="form__item <?= $title['class'] ?>"> <!-- form__item--invalid -->
                 <label for="lot-name">Наименование</label>
-                <input id="lot-name" type="text" name="lot-name" value="<?= $title['value'] ?>" placeholder="Введите наименование лота">
+                <input id="lot-name" type="text" name="lot-name" value="<?= $title['value'] ?>"
+                       placeholder="Введите наименование лота">
                 <span class="form__error"><?= $title['error'] ?></span>
             </div>
             <div class="form__item <?= $category_input['class'] ?>">
                 <label for="category">Категория</label>
                 <select id="category" name="category" value="<?= $category_input['value'] ?>">
                     <?php foreach ($category_input['options'] as $index => $option): ?>
-                        <option <?= ($index === $category_input['selected'] ? 'selected' : '') ?>><?= $option ?></option>
+                        <option <?= ($index === intval($category_input['selected']) ? 'selected' : '') ?>><?= $option ?></option>
                     <?php endforeach; ?>
                 </select>
                 <span class="form__error"><?= $category_input['error'] ?></span>
@@ -28,7 +30,8 @@
         </div>
         <div class="form__item form__item--wide <?= $message['class'] ?>">
             <label for="message">Описание</label>
-            <textarea id="message" name="message" placeholder="Напишите описание лота"><?= $message['value'] ?></textarea>
+            <textarea id="message" name="message"
+                      placeholder="Напишите описание лота"><?= $message['value'] ?></textarea>
             <span class="form__error"><?= $message['error'] ?></span>
         </div>
         <div class="form__item form__item--file"> <!-- form__item--uploaded -->
@@ -60,7 +63,8 @@
             </div>
             <div class="form__item <?= $lot_date['class'] ?>">
                 <label for="lot-date">Дата заверщения</label>
-                <input class="form__input-date" id="lot-date" type="text" name="lot-date" value="<?= $lot_date['value'] ?>" placeholder="20.05.2017">
+                <input class="form__input-date" id="lot-date" type="text" name="lot-date"
+                       value="<?= $lot_date['value'] ?>" placeholder="20.05.2017">
                 <span class="form__error"><?= $lot_date['error'] ?></span>
             </div>
         </div>

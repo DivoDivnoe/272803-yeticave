@@ -4,7 +4,6 @@
  * Class QueriesRepository
  * базовый класс запросов к базе данных
  */
-
 abstract class QueriesRepository
 {
     protected $db;

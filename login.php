@@ -1,6 +1,20 @@
 <?php
 
-require_once 'init.php';
+require_once 'classes/Database.php';
+require_once 'classes/User.php';
+require_once 'classes/Categories_repository.php';
+require_once 'classes/Users_repository.php';
+require_once 'functions/form_validate_functions.php';
+require_once 'configs/database_connect_data.php';
+require_once 'functions/include_template_function.php';
+require_once 'functions/user_functions.php';
+
+session_start();
+
+$db = new Database(...$connect_data);
+$users_repository = new UsersRepository($db);
+$user = new User($users_repository);
+$categories_repository = new CategoriesRepository($db);
 
 $categories = $categories_repository->get_all_categories();
 
@@ -12,9 +26,14 @@ if (isset($_POST['submit']) && !$validate_form) {
     $user->auth_user($users_repository, $_POST['email'], $_POST['password']);
 
     if ($user->is_auth_user()) {
-        header('Location: /index.php');
+        header('Location: index.php');
     }
-    $data = ['email' => $email_post, 'pass' => $pass_post, 'form_class' => $validate_form, 'auth' => show_auth_user($user)];
+    $data = [
+        'email' => $email_post,
+        'pass' => $pass_post,
+        'form_class' => $validate_form,
+        'auth' => show_auth_user($user)
+    ];
 
 } else {
     $data = ['email' => $email_post, 'pass' => $pass_post, 'form_class' => $validate_form];
